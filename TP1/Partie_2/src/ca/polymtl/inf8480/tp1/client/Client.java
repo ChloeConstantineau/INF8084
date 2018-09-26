@@ -1,12 +1,15 @@
 package ca.polymtl.inf8480.tp1.client;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 import java.nio.file.Files;
 
@@ -20,7 +23,7 @@ public class Client {
     private static String[] param;
     private ServerInterface AuthServerStub;
     private ServerInterface FileSystemStub;
-    private String PathClientFiles = "ClientSide/Files";
+    private String PathClientFiles = "ClientSide/Files/";
     private String PathClientList = "ClientSide/ClientList.txt";
     private Credentials credentials;
 
@@ -50,8 +53,8 @@ public class Client {
         if (System.getSecurityManager() == null) {
             System.setSecurityManager(new SecurityManager());
         }
-        AuthServerStub = loadServerStub(serverHostname, "authServer");
-        FileSystemStub = loadServerStub(serverHostname, "fileSystemServer");
+        AuthServerStub = loadServerStub(serverHostname, "serverAuth");
+        FileSystemStub = loadServerStub(serverHostname, "serverFileSystem");
     }
 
     private void run() {
@@ -114,10 +117,10 @@ public class Client {
                 if (isNewClient) {
                     writeToClientList(credentials);
                 }
-                System.out.println(ConsoleOutput.REGISTRATION_APPROVED);
+                System.out.println(ConsoleOutput.AUTH_APPROVED);
 
             } else {
-                System.out.println(ConsoleOutput.REGISTRATION_DENIED);
+                System.out.println(ConsoleOutput.AUTH_DENIED);
             }
 
         } catch (RemoteException e) {
@@ -126,11 +129,27 @@ public class Client {
     }
 
     private void create(String name) {
+        if (name == "") {
+            System.out.println(ConsoleOutput.INVALID_FILE_NAME);
+            return;
+        }
 
+        try {
+            if (FileSystemStub.create(name)) {
+                System.out.println(ConsoleOutput.NEW_FILE_CREATED + name);
+            }
+        } catch (RemoteException e) {
+            System.out.println("Error: " + e.getMessage());
+        }
     }
 
     private void list() {
-
+        try {
+            String fileList = FileSystemStub.list();
+            System.out.println(fileList);
+        } catch (RemoteException e) {
+            System.out.println("Error: " + e.getMessage());
+        }
     }
 
     private void syncLocalDirectory() {
@@ -156,5 +175,42 @@ public class Client {
         } catch (IOException e) {
             System.out.println("Error: " + e.getMessage());
         }
+    }
+
+    private String computeChecksum(String fileName) {
+        String fileContent = "";
+        byte[] content = new byte[1024];
+        MessageDigest md = null;
+
+        try {
+            fileContent = new String(Files.readAllBytes(Paths.get(PathClientFiles + fileName)));
+        } catch (IOException e) {
+            System.out.println("Error: " + e.getMessage());
+        }
+
+        try {
+            content = fileContent.getBytes("UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            System.out.println("Error: " + e.getMessage());
+        }
+
+        try {
+            md = MessageDigest.getInstance("MD5");
+        } catch (
+                NoSuchAlgorithmException e) {
+            System.out.println("Error: " + e.getMessage());
+        }
+
+        if (md != null) {
+            byte[] digest = md.digest(content);
+            StringBuffer sb = new StringBuffer();
+            for (int i = 0; i < digest.length; ++i) {
+                sb.append(Integer.toHexString((digest[i] & 0xFF) | 0x100), 1, 3);
+            }
+
+            return sb.toString();
+        }
+
+        return null;
     }
 }
