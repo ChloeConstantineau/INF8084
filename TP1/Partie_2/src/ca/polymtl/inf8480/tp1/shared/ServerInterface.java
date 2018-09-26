@@ -7,13 +7,13 @@ public interface ServerInterface extends Remote {
 	//**Auth**//
 	boolean newClient(Credentials credentials) throws RemoteException;
 	boolean verifyClient(Credentials credentials) throws RemoteException;
-	//verify
 
-	//**File server**//
-	//Create
-	//List
-	//SyncLocalDirectory
-	//Get
-	//Lock
-	//Puh
+    //**File server**//
+//    boolean create(String name) throws RemoteException;
+    //List
+//    String list() throws RemoteException;
+    //SyncLocalDirectory
+    //Get
+    //Lock
+    //Puh
 }
