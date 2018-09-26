@@ -14,7 +14,7 @@ public interface ServerInterface extends Remote {
     //List
     String list() throws RemoteException;
     //SyncLocalDirectory
-    //Get
+    String get(String name, String checksum) throws RemoteException;
     //Lock
     //Puh
 }

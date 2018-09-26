@@ -1,7 +1,6 @@
 package ca.polymtl.inf8480.tp1.client;
 
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
+import java.io.*;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.rmi.NotBoundException;
@@ -16,6 +15,7 @@ import java.nio.file.Files;
 import ca.polymtl.inf8480.tp1.shared.ConsoleOutput;
 import ca.polymtl.inf8480.tp1.shared.ServerInterface;
 import ca.polymtl.inf8480.tp1.shared.Credentials;
+import com.sun.xml.internal.ws.policy.privateutil.PolicyUtils;
 
 public class Client {
 
@@ -23,12 +23,13 @@ public class Client {
     private static String[] param;
     private ServerInterface AuthServerStub;
     private ServerInterface FileSystemStub;
-    private String PathClientFiles = "ClientSide/Files/";
+    private String PathClientFiles = "ClientSide/Files";
     private String PathClientList = "ClientSide/ClientList.txt";
     private Credentials credentials;
 
     public static void main(String[] args) {
         String localHostname = "127.0.0.1";
+
         functionName = "";
         param = new String[2];
         Arrays.fill(param, "");
@@ -154,10 +155,54 @@ public class Client {
 
     private void syncLocalDirectory() {
 
+//        File folder = new File(PathClientFiles);
+//        File[] listOfFiles = folder.listFiles();
+//
+//        for (int i = 0; i < listOfFiles.length; i++)
+//            if (listOfFiles[i].isFile()) {
+//                this.get(listOfFiles[i].getName());
+//            }
     }
 
     private void get(String name) {
+        if (name == "") {
+            System.out.println(ConsoleOutput.INVALID_FILE_NAME);
+            return;
+        }
 
+        File f = new File(PathClientFiles + "/" + name);
+        boolean isAlreadyInDirectory = f.exists();
+        String fileContent = "";
+        String checksum = null;
+
+        if (isAlreadyInDirectory) {
+            checksum = computeChecksum(name);
+        } else {
+            try {
+                f.createNewFile();
+            } catch (IOException e) {
+                System.out.println("Error: " + e.getMessage());
+            }
+        }
+
+        try {
+            fileContent = FileSystemStub.get(name, checksum);
+
+        } catch (RemoteException e) {
+            System.out.println(e.getMessage());
+        }
+
+        if (fileContent == null && isAlreadyInDirectory)
+            System.out.println(ConsoleOutput.CONTENT_IS_ALREADY_UP_TO_DATE);
+        else {
+            try {
+                PrintWriter writer = new PrintWriter(f);
+                writer.print(fileContent);
+                System.out.println(ConsoleOutput.CONTENT_UPDATED);
+            } catch (FileNotFoundException e) {
+                System.out.println("Error: " + e.getMessage());
+            }
+        }
     }
 
     private void lock(String name) {
@@ -183,7 +228,7 @@ public class Client {
         MessageDigest md = null;
 
         try {
-            fileContent = new String(Files.readAllBytes(Paths.get(PathClientFiles + fileName)));
+            fileContent = new String(Files.readAllBytes(Paths.get(PathClientFiles + "/" + fileName)));
         } catch (IOException e) {
             System.out.println("Error: " + e.getMessage());
         }

@@ -42,5 +42,19 @@ public enum ConsoleOutput {
         public String toString() {
             return "New file created : ";
         }
+    },
+
+    CONTENT_UPDATED{
+        @Override
+        public String toString() {
+            return "Content file has been updated";
+        }
+    },
+
+    CONTENT_IS_ALREADY_UP_TO_DATE{
+        @Override
+        public String toString() {
+            return "Content file is already up to date";
+        }
     }
 }
