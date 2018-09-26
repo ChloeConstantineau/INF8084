@@ -9,9 +9,9 @@ import java.rmi.server.UnicastRemoteObject;
 import java.util.HashSet;
 
 import ca.polymtl.inf8480.tp1.shared.Credentials;
-import ca.polymtl.inf8480.tp1.shared.ServerInterface;
+import ca.polymtl.inf8480.tp1.shared.AuthenticationInterface;
 
-public class ServerAuth implements ServerInterface {
+public class ServerAuth implements AuthenticationInterface {
 
     HashSet<Credentials> credentialsSet = new HashSet<>();
 
@@ -30,7 +30,7 @@ public class ServerAuth implements ServerInterface {
 		}
 
 		try {
-			ServerInterface stub = (ServerInterface) UnicastRemoteObject
+			AuthenticationInterface stub = (AuthenticationInterface) UnicastRemoteObject
 					.exportObject(this, 0);
 
 			Registry registry = LocateRegistry.getRegistry();
@@ -96,29 +96,17 @@ public class ServerAuth implements ServerInterface {
 	 * paramètre.
 	 */
 	public boolean newClient(Credentials credentials) throws RemoteException {
-        
-	    // check if is already registered
+
 	    if(credentialsSet.contains(credentials)){
 	        return false;
         }
 
-        // if not, add to hashSet and to file
         addCredentials(credentials);
 	    return true;
     }
 
     public boolean verifyClient(Credentials credentials) throws RemoteException {
 	    return credentialsSet.contains(credentials);
-    }
-
-    // TODO : implement
-    public boolean create(String name) throws RemoteException {
-	    return true;
-    }
-
-    // TODO : implement
-    public String list() throws RemoteException {
-	    return "something";
     }
 
 }

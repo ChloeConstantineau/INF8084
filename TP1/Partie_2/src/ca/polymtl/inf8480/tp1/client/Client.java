@@ -14,15 +14,15 @@ import java.util.Arrays;
 import java.nio.file.Files;
 
 import ca.polymtl.inf8480.tp1.shared.ConsoleOutput;
-import ca.polymtl.inf8480.tp1.shared.ServerInterface;
+import ca.polymtl.inf8480.tp1.shared.AuthenticationInterface;
 import ca.polymtl.inf8480.tp1.shared.Credentials;
 
 public class Client {
 
     private static String functionName;
     private static String[] param;
-    private ServerInterface AuthServerStub;
-    private ServerInterface FileSystemStub;
+    private AuthenticationInterface AuthServerStub;
+    private AuthenticationInterface FileSystemStub;
     private String PathClientFiles = "ClientSide/Files/";
     private String PathClientList = "ClientSide/ClientList.txt";
     private Credentials credentials;
@@ -63,12 +63,12 @@ public class Client {
         }
     }
 
-    private ServerInterface loadServerStub(String hostname, String registryName) {
-        ServerInterface stub = null;
+    private AuthenticationInterface loadServerStub(String hostname, String registryName) {
+        AuthenticationInterface stub = null;
 
         try {
             Registry registry = LocateRegistry.getRegistry(hostname);
-            stub = (ServerInterface) registry.lookup(registryName);
+            stub = (AuthenticationInterface) registry.lookup(registryName);
         } catch (NotBoundException e) {
             System.out.println(ConsoleOutput.REGISTRY_NOT_FOUND);
         } catch (RemoteException e) {
