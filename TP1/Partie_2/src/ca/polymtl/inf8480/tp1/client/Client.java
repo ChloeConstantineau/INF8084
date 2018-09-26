@@ -1,6 +1,5 @@
 package ca.polymtl.inf8480.tp1.client;
 
-import java.rmi.AccessException;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
@@ -12,11 +11,14 @@ import ca.polymtl.inf8480.tp1.shared.ServerInterface;
 
 public class Client {
 
-	public static String functionName;
-	public static String[] param;
+	private static String functionName;
+	private static String[] param;
+    private ServerInterface AuthServerStub;
+    private ServerInterface FileSystemStub;
+    private String PathClientFiles = "ClientSide/Files";
+    private String PathClientConfig = "ClientSide/";
 
-
-	public static void main(String[] args) {
+    public static void main(String[] args) {
 		String localHostname = "127.0.0.1";
 		functionName = "";
 		param = new String[2];
@@ -35,10 +37,6 @@ public class Client {
 		Client client = new Client(localHostname);
 		client.run();
 	}
-
-	private ServerInterface AuthServerStub;
-	private ServerInterface FileSystemStub;
-
 
 	public Client(String serverHostname) {
 		super();
@@ -64,8 +62,6 @@ public class Client {
 			stub = (ServerInterface) registry.lookup(registryName);
 		} catch (NotBoundException e) {
 			System.out.println(ConsoleOutput.REGISTRY_NOT_FOUND);
-		} catch (AccessException e) {
-			System.out.println("Error: " + e.getMessage());
 		} catch (RemoteException e) {
 			System.out.println("Error: " + e.getMessage());
 		}
@@ -76,12 +72,7 @@ public class Client {
 	private void executeCall(){
 
 		switch(functionName){
-			case "new": {
-				if(param[0] == "" || param[1] == "")
-					System.out.println(ConsoleOutput.INVALID_FUNCTION_CALL);
-				else
-					newClient(param[0], param[1]);
-			}
+			case "new": newClient(param[0], param[1]);
 			case "verify":{
 				if(param[0] == "" || param[1] == "")
 					System.out.println(ConsoleOutput.INVALID_FUNCTION_CALL);
@@ -122,7 +113,10 @@ public class Client {
 	}
 
 	private void newClient(String login, String password){
-
+        if(param[0] == "" || param[1] == "") {
+            System.out.println(ConsoleOutput.INVALID_FUNCTION_CALL);
+            return;
+        }
 	}
 
 	private void verifyClient(String login, String password){
