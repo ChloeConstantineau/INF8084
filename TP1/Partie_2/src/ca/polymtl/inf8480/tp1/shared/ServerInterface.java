@@ -5,4 +5,15 @@ import java.rmi.RemoteException;
 
 public interface ServerInterface extends Remote {
 	int execute(int a, int b) throws RemoteException;
+	//**Auth**//
+	//New
+	//Verify
+
+	//**File server**//
+	//Create
+	//List
+	//SyncLocalDirectory
+	//Get
+	//Lock
+	//Puh
 }

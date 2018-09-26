@@ -9,46 +9,44 @@ import java.rmi.registry.Registry;
 import ca.polymtl.inf8480.tp1.shared.ServerInterface;
 
 public class Client {
-	public static void main(String[] args) {
-		String distantHostname = null;
 
-		if (args.length > 0) {
-			distantHostname = args[0];
+	public static String functionName;
+	public static String[] param;
+
+
+	public static void main(String[] args) {
+		String localHostname = "127.0.0.1";
+		functionName = "";
+		param = new String[2];
+		if (args.length >= 1) {
+			functionName = args[0];
+		}
+		if (args.length >= 2) {
+			param[0] = args[1];
+		}
+		if(args.length == 3){
+			param[1] = args[2];
 		}
 
-		Client client = new Client(distantHostname);
+		Client client = new Client(localHostname);
 		client.run();
 	}
 
-	FakeServer localServer = null; // Pour tester la latence d'un appel de
-									// fonction normal.
-	private ServerInterface localServerStub = null;
-	private ServerInterface distantServerStub = null;
+	private ServerInterface localServerStub;
 
-	public Client(String distantServerHostname) {
+
+	public Client(String serverHostname) {
 		super();
 
 		if (System.getSecurityManager() == null) {
 			System.setSecurityManager(new SecurityManager());
 		}
-
-		localServer = new FakeServer();
-		localServerStub = loadServerStub("127.0.0.1");
-
-		if (distantServerHostname != null) {
-			distantServerStub = loadServerStub(distantServerHostname);
-		}
+		localServerStub = loadServerStub(serverHostname);
 	}
 
 	private void run() {
-		appelNormal();
-
-		if (localServerStub != null) {
-			appelRMILocal();
-		}
-
-		if (distantServerStub != null) {
-			appelRMIDistant();
+		if(localServerStub != null) {
+			executeCall();
 		}
 	}
 
@@ -70,41 +68,26 @@ public class Client {
 		return stub;
 	}
 
-	private void appelNormal() {
-		long start = System.nanoTime();
-		int result = localServer.execute(4, 7);
-		long end = System.nanoTime();
+	private void executeCall(){
 
-		System.out.println("Temps écoulé appel normal: " + (end - start)
-				+ " ns");
-		System.out.println("Résultat appel normal: " + result);
-	}
-
-	private void appelRMILocal() {
-		try {
-			long start = System.nanoTime();
-			int result = localServerStub.execute(4, 7);
-			long end = System.nanoTime();
-
-			System.out.println("Temps écoulé appel RMI local: " + (end - start)
-					+ " ns");
-			System.out.println("Résultat appel RMI local: " + result);
-		} catch (RemoteException e) {
-			System.out.println("Erreur: " + e.getMessage());
+		switch(functionName){
+			case "new": {
+				if(param[0] == )
+			}
+			case "verify":
+			case "create":
+			case "list":
+			case "syncLocalDirectory":
+			case "get":
+			case "lock":
 		}
 	}
 
-	private void appelRMIDistant() {
-		try {
-			long start = System.nanoTime();
-			int result = distantServerStub.execute(4, 7);
-			long end = System.nanoTime();
+	private void newClient(String login, String password){
 
-			System.out.println("Temps écoulé appel RMI distant: "
-					+ (end - start) + " ns");
-			System.out.println("Résultat appel RMI distant: " + result);
-		} catch (RemoteException e) {
-			System.out.println("Erreur: " + e.getMessage());
-		}
+	}
+
+	private void VerifyClient(String login, String password){
+
 	}
 }
