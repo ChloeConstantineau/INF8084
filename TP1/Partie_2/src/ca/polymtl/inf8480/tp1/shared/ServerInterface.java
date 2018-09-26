@@ -6,8 +6,8 @@ import java.rmi.RemoteException;
 public interface ServerInterface extends Remote {
 	int execute(int a, int b) throws RemoteException;
 	//**Auth**//
-	boolean newClient(String login, String password) throws RemoteException;
-	boolean verifyClient(String login, String password) throws RemoteException;
+	boolean newClient(Credentials credentials) throws RemoteException;
+	boolean verifyClient(Credentials credentials) throws RemoteException;
 	//verify
 
 	//**File server**//

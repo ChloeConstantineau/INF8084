@@ -79,9 +79,9 @@ public class Client {
 
         switch (functionName) {
             case "new":
-                newClient(param[0], param[1]);
+                identifyClient(param[0], param[1], true);
             case "verify":
-                verifyClient(param[0], param[1]);
+                identifyClient(param[0], param[1], false);
             case "create":
                 create(param[0]);
             case "list":
@@ -97,39 +97,23 @@ public class Client {
         }
     }
 
-    private void newClient(String login, String password) {
-        if (param[0] == "" || param[1] == "") {
+    private void identifyClient(String username, String password, boolean isNewClient) {
+        if (username == "" || password == "") {
             System.out.println(ConsoleOutput.INVALID_FUNCTION_CALL);
             return;
         }
 
-        try {
-            if (AuthServerStub.newClient(param[0], param[1])) {
-                String credentials = param[0] + ", " + param[1] + "/n";
-                writeToClientList(credentials);
-                this.credentials = new Credentials(param[0], param[1]);
-
-                System.out.println(ConsoleOutput.REGISTRATION_APPROVED);
-
-            } else {
-                System.out.println(ConsoleOutput.REGISTRATION_DENIED);
-            }
-
-        } catch (RemoteException e) {
-            System.out.println("Error: " + e.getMessage());
-        }
-    }
-
-    private void verifyClient(String login, String password) {
-        if (param[0] == "" || param[1] == "") {
-            System.out.println(ConsoleOutput.INVALID_FUNCTION_CALL);
-            return;
-        }
+        Credentials loginAttempt = new Credentials(username, password);
 
         try {
-            if (AuthServerStub.verifyClient(param[0], param[1])) {
-                this.login = param[0];
-                this.password = param[1];
+            boolean isAuthSuccessful = isNewClient ? AuthServerStub.newClient(loginAttempt) : AuthServerStub.verifyClient(loginAttempt);
+
+            if (isAuthSuccessful) {
+                this.credentials = loginAttempt;
+
+                if (isNewClient) {
+                    writeToClientList(credentials);
+                }
                 System.out.println(ConsoleOutput.REGISTRATION_APPROVED);
 
             } else {
@@ -165,9 +149,10 @@ public class Client {
 
     }
 
-    private void writeToClientList(String credentials) {
+    private void writeToClientList(Credentials credentials) {
+        String text = credentials.username + ", " + credentials.password;
         try {
-            Files.write(Paths.get(PathClientList), credentials.getBytes(), StandardOpenOption.APPEND);
+            Files.write(Paths.get(PathClientList), text.getBytes(), StandardOpenOption.APPEND);
         } catch (IOException e) {
             System.out.println("Error: " + e.getMessage());
         }
