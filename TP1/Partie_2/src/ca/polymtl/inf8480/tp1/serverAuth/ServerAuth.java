@@ -108,4 +108,14 @@ public class ServerAuth implements ServerInterface {
 	    return true;
     }
 
+    // TODO : implement
+    public boolean create(String name) throws RemoteException {
+	    return true;
+    }
+
+    // TODO : implement
+    public String list() throws RemoteException {
+	    return "something";
+    }
+
 }

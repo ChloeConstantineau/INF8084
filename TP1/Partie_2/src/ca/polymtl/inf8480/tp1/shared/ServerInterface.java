@@ -9,9 +9,9 @@ public interface ServerInterface extends Remote {
 	boolean verifyClient(Credentials credentials) throws RemoteException;
 
     //**File server**//
-//    boolean create(String name) throws RemoteException;
+    boolean create(String name) throws RemoteException;
     //List
-//    String list() throws RemoteException;
+    String list() throws RemoteException;
     //SyncLocalDirectory
     //Get
     //Lock
