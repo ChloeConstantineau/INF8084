@@ -12,22 +12,22 @@ public class Credentials implements java.io.Serializable  {
     }
 
     @Override
-    public boolean equals(Object obj){
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
 
-        if(obj == this){
-            return true;
-        }
-        if(!(obj instanceof Credentials)){
-            return false;
-        }
+        Credentials that = (Credentials) o;
 
-        Credentials credentials = (Credentials) obj;
-        return username == ((Credentials) obj).username &&
-                password == ((Credentials) obj).password;
+        if (username != null ? !username.equals(that.username) : that.username != null) return false;
+        return password != null ? password.equals(that.password) : that.password == null;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(username, password);
+        int result = username != null ? username.hashCode() : 0;
+        result = 31 * result + (password != null ? password.hashCode() : 0);
+        return result;
     }
+
+
 }

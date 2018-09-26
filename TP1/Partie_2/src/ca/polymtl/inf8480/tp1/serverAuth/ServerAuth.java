@@ -6,7 +6,6 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
-import java.util.HashMap;
 import java.util.HashSet;
 
 import ca.polymtl.inf8480.tp1.shared.Credentials;
@@ -35,7 +34,7 @@ public class ServerAuth implements ServerInterface {
 					.exportObject(this, 0);
 
 			Registry registry = LocateRegistry.getRegistry();
-			registry.rebind("server", stub);
+			registry.rebind("serverAuth", stub);
 			System.out.println("ServerAuth ready.");
 		} catch (ConnectException e) {
 			System.err
@@ -82,30 +81,34 @@ public class ServerAuth implements ServerInterface {
 	    credentialsSet.add(new Credentials(username, password));
     }
 
-
-	/*
-	 * Méthode accessible par RMI. Additionne les deux nombres passés en
-	 * paramètre.
-	 */
-	public boolean newClient(Credentials credentials) throws RemoteException {
-
-	    // check if is already registered
-	    if(credentialsSet.contains(credentials)){
-	        return false;
-        }
-
-        // if not, add to hashSet and to file
+    private void addCredentials(Credentials credentials){
         credentialsSet.add(credentials);
         try {
             writeToFile(credentials);
         } catch (IOException e){
             System.err.println("Error: " + e.getMessage());
         }
+    }
+
+
+	/*
+	 * Méthode accessible par RMI. Additionne les deux nombres passés en
+	 * paramètre.
+	 */
+	public boolean newClient(Credentials credentials) throws RemoteException {
+        
+	    // check if is already registered
+	    if(credentialsSet.contains(credentials)){
+	        return false;
+        }
+
+        // if not, add to hashSet and to file
+        addCredentials(credentials);
 	    return true;
     }
 
     public boolean verifyClient(Credentials credentials) throws RemoteException {
-	    return true;
+	    return credentialsSet.contains(credentials);
     }
 
     // TODO : implement
