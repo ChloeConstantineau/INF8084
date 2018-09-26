@@ -63,11 +63,11 @@ public class Client {
     }
 
     private ServerInterface loadServerStub(String hostname, String registryName) {
-        AuthenticationInterface stub = null;
+        ServerInterface stub = null;
 
         try {
             Registry registry = LocateRegistry.getRegistry(hostname);
-            stub = (AuthenticationInterface) registry.lookup(registryName);
+            stub = (ServerInterface) registry.lookup(registryName);
         } catch (NotBoundException e) {
             System.out.println(ConsoleOutput.REGISTRY_NOT_FOUND);
         } catch (RemoteException e) {
