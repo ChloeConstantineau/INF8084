@@ -7,6 +7,7 @@ public interface ServerInterface extends Remote {
 	int execute(int a, int b) throws RemoteException;
 	//**Auth**//
 	boolean newClient(String login, String password) throws RemoteException;
+	boolean verifyClient(String login, String password) throws RemoteException;
 	//verify
 
 	//**File server**//
