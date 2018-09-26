@@ -5,25 +5,15 @@ import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
-import java.lang.*;
 
 import ca.polymtl.inf8480.tp1.shared.ServerInterface;
 
 public class Client {
-	private static int x_size = 0;
-	
 	public static void main(String[] args) {
 		String distantHostname = null;
 
-		if (args.length == 1) {
+		if (args.length > 0) {
 			distantHostname = args[0];
-		}
-		else if(args.length > 1){
-			distantHostname = args[0];
-			x_size = Integer.parseInt(args[1]);
-		}
-		else {
-			System.out.println("Nombre d'argument inférieur a 1");
 		}
 
 		Client client = new Client(distantHostname);
@@ -80,49 +70,41 @@ public class Client {
 		return stub;
 	}
 
-	private void byteArrayHelper() {
-		byte[] byteArray = new byte[(int)Math.pow((double)10, (double)x_size)];
-		System.out.println("Payload size is " + byteArray.length);
-
-		try{
-			localServerStub.emptyFunc(byteArray, byteArray);
-		} catch(RemoteException e) {
-			System.out.println("emptyFunc threw and exception");
-		}
-	}
-
 	private void appelNormal() {
 		long start = System.nanoTime();
-		//int result = localServer.execute(4, 7);
-		byteArrayHelper();
+		int result = localServer.execute(4, 7);
 		long end = System.nanoTime();
 
-		System.out.println("Temps écoulé appel normal: " + (end - start) + " ns");
-		
-		//System.out.println("Résultat appel normal: " + result);
+		System.out.println("Temps écoulé appel normal: " + (end - start)
+				+ " ns");
+		System.out.println("Résultat appel normal: " + result);
 	}
 
 	private void appelRMILocal() {
-		
-		long start = System.nanoTime();
-		//int result = localServerStub.execute(4, 7);
-		byteArrayHelper();
-		long end = System.nanoTime();
+		try {
+			long start = System.nanoTime();
+			int result = localServerStub.execute(4, 7);
+			long end = System.nanoTime();
 
-		System.out.println("Temps écoulé appel RMI local: " + (end - start) + " ns");
-		//System.out.println("Résultat appel RMI local: " + result);
-		
+			System.out.println("Temps écoulé appel RMI local: " + (end - start)
+					+ " ns");
+			System.out.println("Résultat appel RMI local: " + result);
+		} catch (RemoteException e) {
+			System.out.println("Erreur: " + e.getMessage());
+		}
 	}
 
 	private void appelRMIDistant() {
-		
-		long start = System.nanoTime();
-		//int result = distantServerStub.execute(4, 7);
-		byteArrayHelper();
-		long end = System.nanoTime();
+		try {
+			long start = System.nanoTime();
+			int result = distantServerStub.execute(4, 7);
+			long end = System.nanoTime();
 
-		System.out.println("Temps écoulé appel RMI distant: " + (end - start) + " ns");
-		//System.out.println("Résultat appel RMI distant: " + result);
-		
+			System.out.println("Temps écoulé appel RMI distant: "
+					+ (end - start) + " ns");
+			System.out.println("Résultat appel RMI distant: " + result);
+		} catch (RemoteException e) {
+			System.out.println("Erreur: " + e.getMessage());
+		}
 	}
 }

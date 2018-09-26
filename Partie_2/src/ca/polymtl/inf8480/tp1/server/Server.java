@@ -49,9 +49,4 @@ public class Server implements ServerInterface {
 	public int execute(int a, int b) throws RemoteException {
 		return a + b;
 	}
-
-	@Override
-	public void emptyFunc(byte[] array1, byte[] array2) throws RemoteException {
-		return;
-	}
 }
