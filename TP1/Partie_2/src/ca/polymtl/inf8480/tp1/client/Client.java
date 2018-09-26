@@ -55,11 +55,11 @@ public class Client {
             System.setSecurityManager(new SecurityManager());
         }
         AuthServerStub = loadServerStub(serverHostname, "serverAuth");
-        FileSystemStub = loadServerStub(serverHostname, "serverFileSystem");
+//        FileSystemStub = loadServerStub(serverHostname, "serverFileSystem");
     }
 
     private void run() {
-        if (AuthServerStub != null && FileSystemStub != null) {
+        if (AuthServerStub != null) {
             executeCall();
         }
     }

@@ -4,10 +4,9 @@ import java.rmi.Remote;
 import java.rmi.RemoteException;
 
 public interface ServerInterface extends Remote {
-    //**Auth**//
-    boolean newClient(Credentials credentials) throws RemoteException;
-
-    boolean verifyClient(Credentials credentials) throws RemoteException;
+	//**Auth**//
+	boolean newClient(Credentials credentials) throws RemoteException;
+	boolean verifyClient(Credentials credentials) throws RemoteException;
 
     //**File server**//
     boolean create(String name) throws RemoteException;
