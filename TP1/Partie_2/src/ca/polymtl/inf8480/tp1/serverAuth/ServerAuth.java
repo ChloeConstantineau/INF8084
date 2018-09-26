@@ -50,8 +50,11 @@ public class ServerAuth implements ServerInterface {
 		return a + b;
 	}
 
-	public boolean newClient(String login, String password){
+	public boolean newClient(String login, String password) throws RemoteException {
 	    // client already exists ? return error message + false : add to registry + return true;
+
+
+        // TODO : when starting server, read from file for login/password; add to hashmap
 
 
 	    return true;

@@ -72,7 +72,7 @@ public class Client {
 
 		switch(functionName){
 			case "new": {
-				if(param[0] == )
+//				if(param[0] == )
 			}
 			case "verify":
 			case "create":
