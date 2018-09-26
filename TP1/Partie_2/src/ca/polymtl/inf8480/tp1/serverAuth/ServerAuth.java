@@ -1,4 +1,4 @@
-package ca.polymtl.inf8480.tp1.server;
+package ca.polymtl.inf8480.tp1.serverAuth;
 
 import java.rmi.ConnectException;
 import java.rmi.RemoteException;
@@ -8,14 +8,14 @@ import java.rmi.server.UnicastRemoteObject;
 
 import ca.polymtl.inf8480.tp1.shared.ServerInterface;
 
-public class Server implements ServerInterface {
+public class ServerAuth implements ServerInterface {
 
 	public static void main(String[] args) {
-		Server server = new Server();
+		ServerAuth server = new ServerAuth();
 		server.run();
 	}
 
-	public Server() {
+	public ServerAuth() {
 		super();
 	}
 
@@ -30,7 +30,7 @@ public class Server implements ServerInterface {
 
 			Registry registry = LocateRegistry.getRegistry();
 			registry.rebind("server", stub);
-			System.out.println("Server ready.");
+			System.out.println("ServerAuth ready.");
 		} catch (ConnectException e) {
 			System.err
 					.println("Impossible de se connecter au registre RMI. Est-ce que rmiregistry est lancé ?");
@@ -49,4 +49,11 @@ public class Server implements ServerInterface {
 	public int execute(int a, int b) throws RemoteException {
 		return a + b;
 	}
+
+	public boolean newClient(String login, String password){
+	    // client already exists ? return error message + false : add to registry + return true;
+
+
+	    return true;
+    }
 }
