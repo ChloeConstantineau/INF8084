@@ -2,6 +2,20 @@ package ca.polymtl.inf8480.tp1.shared;
 
 public enum ConsoleOutput {
 
+    REGISTRY_NOT_FOUND {
+        @Override
+        public String toString(){
+            return "The given name was not found in the registry.";
+        }
+    },
+
+    INVALID_FUNCTION_CALL {
+        @Override
+        public String toString(){
+            return "The given function name or parameter is not supported";
+        }
+    },
+
     REGISTRATION_DENIED {
         @Override
         public String toString(){
