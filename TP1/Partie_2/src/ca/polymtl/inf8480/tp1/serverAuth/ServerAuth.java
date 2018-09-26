@@ -1,5 +1,8 @@
 package ca.polymtl.inf8480.tp1.serverAuth;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.rmi.ConnectException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
@@ -39,7 +42,22 @@ public class ServerAuth implements ServerInterface {
 		} catch (Exception e) {
 			System.err.println("Erreur: " + e.getMessage());
 		}
+
+        // TODO : when starting server, read from file for login/password; add to hashmap
+		try{
+			newClient("r", "fr");
+		} catch (RemoteException e){
+			System.err.println("Erreur: " + e.getMessage());
+		}
 	}
+
+    private void writeToFile(String username, String password) throws IOException {
+	    String file = "./ServerSide/ClientList.txt";
+	    String str = username + "@" + password;
+        BufferedWriter writer = new BufferedWriter(new FileWriter(file, true));
+        writer.append(str + '\n');
+        writer.close();
+    }
 
 	/*
 	 * Méthode accessible par RMI. Additionne les deux nombres passés en
@@ -51,10 +69,7 @@ public class ServerAuth implements ServerInterface {
 	}
 
 	public boolean newClient(String login, String password) throws RemoteException {
-	    // client already exists ? return error message + false : add to registry + return true;
-
-
-        // TODO : when starting server, read from file for login/password; add to hashmap
+        // client already exists ? return error message + false : add to registry(file and hashmap) + return true;
 
 
 	    return true;
