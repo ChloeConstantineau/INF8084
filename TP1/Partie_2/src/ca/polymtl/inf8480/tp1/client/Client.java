@@ -12,10 +12,8 @@ import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 import java.nio.file.Files;
 
-import ca.polymtl.inf8480.tp1.shared.ConsoleOutput;
-import ca.polymtl.inf8480.tp1.shared.AuthenticationInterface;
-import ca.polymtl.inf8480.tp1.shared.Credentials;
-import ca.polymtl.inf8480.tp1.shared.FileSystemInterface;
+import ca.polymtl.inf8480.tp1.shared.*;
+
 
 public class Client {
 
@@ -54,8 +52,8 @@ public class Client {
         if (System.getSecurityManager() == null) {
             System.setSecurityManager(new SecurityManager());
         }
-        AuthServerStub = loadServerStub(serverHostname, "serverAuth");
-        FileSystemStub = loadServerStub(serverHostname, "serverFileSystem");
+        AuthServerStub = (AuthenticationInterface) loadServerStub(serverHostname, "serverAuth");
+        FileSystemStub = (FileSystemInterface) loadServerStub(serverHostname, "serverFileSystem");
     }
 
     private void run() {
@@ -64,12 +62,12 @@ public class Client {
         }
     }
 
-    private AuthenticationInterface loadServerStub(String hostname, String registryName) {
-        AuthenticationInterface stub = null;
+    private ServerInterface loadServerStub(String hostname, String registryName) {
+        ServerInterface stub = null;
 
         try {
             Registry registry = LocateRegistry.getRegistry(hostname);
-            stub = (AuthenticationInterface) registry.lookup(registryName);
+            stub = (ServerInterface) registry.lookup(registryName);
         } catch (NotBoundException e) {
             System.out.println(ConsoleOutput.REGISTRY_NOT_FOUND);
         } catch (RemoteException e) {
