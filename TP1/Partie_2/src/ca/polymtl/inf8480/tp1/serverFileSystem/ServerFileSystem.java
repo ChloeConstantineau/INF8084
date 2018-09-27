@@ -74,8 +74,7 @@ public class ServerFileSystem implements FileSystemInterface {
 
 
     /*
-     * Méthode accessible par RMI. Additionne les deux nombres passés en
-     * paramètre.
+     * Méthode accessible par RMI.
      */
     public boolean create(String name) throws RemoteException {
         return true;

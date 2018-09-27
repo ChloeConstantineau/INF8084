@@ -92,8 +92,7 @@ public class ServerAuth implements AuthenticationInterface {
 
 
 	/*
-	 * Méthode accessible par RMI. Additionne les deux nombres passés en
-	 * paramètre.
+	 * Méthode accessible par RMI.
 	 */
 	public boolean newClient(Credentials credentials) throws RemoteException {
 
