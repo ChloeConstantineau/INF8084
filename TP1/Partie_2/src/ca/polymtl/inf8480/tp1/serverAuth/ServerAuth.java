@@ -14,6 +14,8 @@ import ca.polymtl.inf8480.tp1.shared.AuthenticationInterface;
 public class ServerAuth implements AuthenticationInterface {
 
     HashSet<Credentials> credentialsSet = new HashSet<>();
+    final String PATH = "./ServerSide/ClientList.txt";
+
 
 	public static void main(String[] args) {
 		ServerAuth server = new ServerAuth();
@@ -56,17 +58,15 @@ public class ServerAuth implements AuthenticationInterface {
 	}
 
     private void writeToFile(Credentials credentials) throws IOException {
-	    String path = "./ServerSide/ClientList.txt";
 	    String str = credentials.username + "@" + credentials.password;
-	    BufferedWriter writer = new BufferedWriter(new FileWriter(path, true));
+	    BufferedWriter writer = new BufferedWriter(new FileWriter(PATH, true));
 
         writer.append(str + '\n');
         writer.close();
     }
 
     private void readFromFile() throws  IOException {
-        String path = "./ServerSide/ClientList.txt";
-        File file = new File(path);
+        File file = new File(PATH);
         BufferedReader br = new BufferedReader(new FileReader(file));
 
         String str;
