@@ -2,29 +2,52 @@ package ca.polymtl.inf8480.tp1.serverAuth;
 
 import java.io.*;
 import java.rmi.ConnectException;
+import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.HashSet;
 
-import ca.polymtl.inf8480.tp1.shared.Credentials;
-import ca.polymtl.inf8480.tp1.shared.AuthenticationInterface;
+import ca.polymtl.inf8480.tp1.shared.*;
 
 public class ServerAuth implements AuthenticationInterface {
 
-    HashSet<Credentials> credentialsSet = new HashSet<>();
-    final String PATH = "./ServerSide/ClientList.txt";
+    private HashSet<Credentials> credentialsSet = new HashSet<>();
+    private FileSystemInterface fileSystemStub;
+    private final String PATH = "./ServerSide/ClientList.txt";
+    private final String SERVERHOST_NAME = "127.0.0.1";
 
 
-	public static void main(String[] args) {
+
+    public static void main(String[] args) {
 		ServerAuth server = new ServerAuth();
 		server.run();
 	}
 
 	public ServerAuth() {
 		super();
+
+        if (System.getSecurityManager() == null) {
+            System.setSecurityManager(new SecurityManager());
+        }
+        fileSystemStub = (FileSystemInterface) loadServerStub(SERVERHOST_NAME, "serverFileSystem");
 	}
+
+    private ServerInterface loadServerStub(String hostname, String registryName) {
+        ServerInterface stub = null;
+
+        try {
+            Registry registry = LocateRegistry.getRegistry(hostname);
+            stub = (ServerInterface) registry.lookup(registryName);
+        } catch (NotBoundException e) {
+            System.out.println(ConsoleOutput.REGISTRY_NOT_FOUND.toString());
+        } catch (RemoteException e) {
+            System.out.println("Error: " + e.getMessage());
+        }
+
+        return stub;
+    }
 
 	private void run() {
 		if (System.getSecurityManager() == null) {
@@ -95,16 +118,20 @@ public class ServerAuth implements AuthenticationInterface {
 	 * Méthode accessible par RMI.
 	 */
 	public boolean newClient(Credentials credentials) throws RemoteException {
+	    System.out.println("New client requested");
 
 	    if(credentialsSet.contains(credentials)){
+            System.out.println("Client already exists");
 	        return false;
         }
 
         addCredentials(credentials);
+        System.out.println("New client created");
 	    return true;
     }
 
     public boolean verifyClient(Credentials credentials) throws RemoteException {
+        System.out.println("New client verification requested");
 	    return credentialsSet.contains(credentials);
     }
 

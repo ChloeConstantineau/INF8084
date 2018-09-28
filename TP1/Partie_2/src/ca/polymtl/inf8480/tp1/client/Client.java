@@ -11,6 +11,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 import java.nio.file.Files;
+import java.util.List;
 
 import ca.polymtl.inf8480.tp1.shared.*;
 
@@ -228,7 +229,7 @@ public class Client {
         }
 
         //Is file stored server side
-        var filesOnServer = list();
+        String filesOnServer = list();
         if (!filesOnServer.contains(name)) {
             System.out.println(ConsoleOutput.FILE_404.toString());
         }
