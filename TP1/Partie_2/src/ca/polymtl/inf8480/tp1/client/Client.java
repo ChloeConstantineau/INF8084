@@ -24,7 +24,7 @@ public class Client {
     private FileSystemInterface fileSystemStub;
     private String pathClientFiles = "ClientSide/Files/";
     private String pathClientList = "ClientSide/ClientList.txt";
-    private Credentials credentials = null;
+    private Credentials credentials;
 
     public static void main(String[] args) {
         String localHostname = "127.0.0.1";
@@ -88,7 +88,7 @@ public class Client {
                 identifyClient(param[0], param[1], false);
                 break;
             case "create":
-                create(param[1]);
+                create(param[0]);
                 break;
             case "list":
                 list();
@@ -123,7 +123,7 @@ public class Client {
             boolean isAuthSuccessful = isNewClient ? authServerStub.newClient(loginAttempt) : authServerStub.verifyClient(loginAttempt);
 
             if (isAuthSuccessful) {
-                this.credentials = loginAttempt;
+                credentials = new Credentials(loginAttempt.username, loginAttempt.password);
 
                 if (isNewClient) {
                     writeToClientList(credentials);
@@ -147,7 +147,7 @@ public class Client {
         if (name == "") {
             System.out.println(ConsoleOutput.INVALID_FILE_NAME.toString());
             return;
-        }else if(credentials == null){
+        } else if(credentials == null){
             System.out.println(ConsoleOutput.INVALID_CREDENTIALS.toString());
             return;
         }
