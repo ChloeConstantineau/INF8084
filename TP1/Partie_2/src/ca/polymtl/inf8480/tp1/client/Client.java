@@ -2,7 +2,6 @@ package ca.polymtl.inf8480.tp1.client;
 
 import java.io.*;
 import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
@@ -11,7 +10,6 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 import java.nio.file.Files;
-import java.util.List;
 
 import ca.polymtl.inf8480.tp1.shared.*;
 
@@ -24,6 +22,7 @@ public class Client {
     private FileSystemInterface fileSystemStub;
     private String pathClientFiles = "ClientSide/Files/";
     private String pathClientList = "ClientSide/ClientList.txt";
+    private String pathCurrentUser = "ClientSide/CurrentUser.txt";
     private Credentials credentials;
 
     public static void main(String[] args) {
@@ -58,8 +57,10 @@ public class Client {
     }
 
     private void run() {
-        if (authServerStub != null) {
+        if (authServerStub != null || fileSystemStub != null) {
             executeCall();
+        } else {
+            System.out.println("Server stubs not instantiated");
         }
     }
 
@@ -123,17 +124,21 @@ public class Client {
             boolean isAuthSuccessful = isNewClient ? authServerStub.newClient(loginAttempt) : authServerStub.verifyClient(loginAttempt);
 
             if (isAuthSuccessful) {
+<<<<<<< HEAD
                 credentials = new Credentials(loginAttempt.username, loginAttempt.password);
 
+=======
+                SetCurrentUser(loginAttempt);
+>>>>>>> c10850d836e791d30033abf92c9f02a077c90c93
                 if (isNewClient) {
-                    writeToClientList(credentials);
+                    writeToClientList(loginAttempt);
                     System.out.println(ConsoleOutput.REGISTRATION_APPROVED.toString());
                 } else
                     System.out.println(ConsoleOutput.AUTH_APPROVED.toString());
 
             } else {
-                if(isNewClient)
-                System.out.println(ConsoleOutput.REGISTRATION_DENIED.toString());
+                if (isNewClient)
+                    System.out.println(ConsoleOutput.REGISTRATION_DENIED.toString());
                 else
                     System.out.println(ConsoleOutput.AUTH_DENIED.toString());
             }
@@ -147,7 +152,13 @@ public class Client {
         if (name == "") {
             System.out.println(ConsoleOutput.INVALID_FILE_NAME.toString());
             return;
+<<<<<<< HEAD
         } else if(credentials == null){
+=======
+        }
+        Credentials credentials = getCurrentUser();
+        if(credentials == null){
+>>>>>>> c10850d836e791d30033abf92c9f02a077c90c93
             System.out.println(ConsoleOutput.INVALID_CREDENTIALS.toString());
             return;
         }
@@ -240,7 +251,7 @@ public class Client {
         //Is file stored client side
         File f = new File(pathClientFiles + "/" + name);
         String checksum = null;
-        String content = getClientFileContent(name);
+        String content = getFileContent(name);
         if (!f.exists()) {
             try {
                 fileSystemStub.lock(credentials, new Document(name, null, content));
@@ -259,7 +270,7 @@ public class Client {
         }
 
         boolean hasBeenPushed = false;
-        String content = getClientFileContent(name);
+        String content = getFileContent(name);
 
         try {
             hasBeenPushed = fileSystemStub.push(credentials, new Document(name, null, content));
@@ -274,17 +285,16 @@ public class Client {
     private void writeToClientList(Credentials credentials) {
         String str = credentials.username + "@" + credentials.password;
         BufferedWriter writer;
-        try{
+        try {
             writer = new BufferedWriter(new FileWriter(pathClientList, true));
             writer.append(str + '\n');
             writer.close();
-        }
-        catch(IOException e){
+        } catch (IOException e) {
             System.out.println("Error: " + e.getMessage());
         }
     }
 
-    private String getClientFileContent(String fileName) {
+    private String getFileContent(String fileName) {
         try {
             return new String(Files.readAllBytes(Paths.get(pathClientFiles + "/" + fileName)));
         } catch (IOException e) {
@@ -293,8 +303,35 @@ public class Client {
         return null;
     }
 
+    private void SetCurrentUser(Credentials credentials) {
+        String str = credentials.username + "@" + credentials.password;
+        BufferedWriter writer;
+        try {
+            writer = new BufferedWriter(new FileWriter(pathCurrentUser, true));
+            writer.write(str);
+            writer.close();
+        } catch (IOException e) {
+            System.out.println("Error: " + e.getMessage());
+        }
+    }
+
+    private Credentials getCurrentUser(){
+        try {
+            String line = new String(Files.readAllBytes(Paths.get(pathCurrentUser)));
+            if(line == null || line == "")
+                return null;
+            else{
+                String[] credentials = line.split("@");
+                return new Credentials(credentials[0], credentials[1]);
+            }
+        } catch (IOException e) {
+            System.out.println("Error: " + e.getMessage());
+        }
+        return null;
+    }
+
     private String computeChecksum(String fileName) {
-        String fileContent = getClientFileContent(fileName);
+        String fileContent = getFileContent(fileName);
         byte[] content = new byte[1024];
         MessageDigest md = null;
 
