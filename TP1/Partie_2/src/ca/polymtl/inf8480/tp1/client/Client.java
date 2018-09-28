@@ -1,6 +1,8 @@
 package ca.polymtl.inf8480.tp1.client;
 
 import java.io.*;
+import java.nio.charset.Charset;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
@@ -10,6 +12,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 import java.nio.file.Files;
+import java.util.List;
 
 import ca.polymtl.inf8480.tp1.shared.*;
 
@@ -147,6 +150,7 @@ public class Client {
             System.out.println(ConsoleOutput.INVALID_FILE_NAME.toString());
             return;
         }
+
         Credentials credentials = getCurrentUser();
         if(credentials == null){
             System.out.println(ConsoleOutput.INVALID_CREDENTIALS.toString());
@@ -155,6 +159,15 @@ public class Client {
 
         try {
             if (fileSystemStub.create(credentials, name)) {
+                Path file = Paths.get(pathClientFiles + name + ".txt");
+                List<String> s = Arrays.asList("");
+
+                try {
+                    Files.write(file, s , Charset.forName("UTF-8"));
+                } catch (IOException e){
+                    System.err.println("Error: " + e.getMessage());
+                }
+
                 System.out.println(ConsoleOutput.NEW_FILE_CREATED.toString() + " " + name);
             }
         } catch (RemoteException e) {
