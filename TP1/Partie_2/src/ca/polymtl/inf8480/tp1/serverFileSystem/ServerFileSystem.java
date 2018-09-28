@@ -185,4 +185,8 @@ public class ServerFileSystem implements FileSystemInterface {
     public String get(String name, String checksum) throws RemoteException {
         return null;
     }
+
+    public boolean push(String name, String content) throws RemoteException {
+        return false;
+    }
 }

@@ -37,24 +37,45 @@ public enum ConsoleOutput {
         }
     },
 
-    NEW_FILE_CREATED{
+    NEW_FILE_CREATED {
         @Override
         public String toString() {
             return "New file created : ";
         }
     },
 
-    CONTENT_UPDATED{
+    CONTENT_UPDATED {
         @Override
         public String toString() {
             return "Content file has been updated";
         }
     },
 
-    CONTENT_IS_ALREADY_UP_TO_DATE{
+    CONTENT_IS_ALREADY_UP_TO_DATE {
         @Override
         public String toString() {
             return "Content file is already up to date";
+        }
+    },
+
+    PUSHED_DENIED {
+        @Override
+        public String toString() {
+            return "Push denied: The file has to be locked prior to pushing";
+        }
+    },
+
+    PUSHED_ACCEPTED{
+        @Override
+        public String toString() {
+            return "Push successful";
+        }
+    },
+
+    FILE_404{
+        @Override
+        public String toString() {
+            return "File not found on server.";
         }
     }
 }

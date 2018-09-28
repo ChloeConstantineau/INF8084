@@ -69,7 +69,7 @@ public class Client {
             Registry registry = LocateRegistry.getRegistry(hostname);
             stub = (ServerInterface) registry.lookup(registryName);
         } catch (NotBoundException e) {
-            System.out.println(ConsoleOutput.REGISTRY_NOT_FOUND);
+            System.out.println(ConsoleOutput.REGISTRY_NOT_FOUND.toString());
         } catch (RemoteException e) {
             System.out.println("Error: " + e.getMessage());
         }
@@ -101,7 +101,7 @@ public class Client {
 
     private void identifyClient(String username, String password, boolean isNewClient) {
         if (username == "" || password == "") {
-            System.out.println(ConsoleOutput.INVALID_FUNCTION_CALL);
+            System.out.println(ConsoleOutput.INVALID_FUNCTION_CALL.toString());
             return;
         }
 
@@ -116,10 +116,10 @@ public class Client {
                 if (isNewClient) {
                     writeToClientList(credentials);
                 }
-                System.out.println(ConsoleOutput.AUTH_APPROVED);
+                System.out.println(ConsoleOutput.AUTH_APPROVED.toString());
 
             } else {
-                System.out.println(ConsoleOutput.AUTH_DENIED);
+                System.out.println(ConsoleOutput.AUTH_DENIED.toString());
             }
 
         } catch (RemoteException e) {
@@ -129,26 +129,29 @@ public class Client {
 
     private void create(String name) {
         if (name == "") {
-            System.out.println(ConsoleOutput.INVALID_FILE_NAME);
+            System.out.println(ConsoleOutput.INVALID_FILE_NAME.toString());
             return;
         }
 
         try {
             if (FileSystemStub.create(name)) {
-                System.out.println(ConsoleOutput.NEW_FILE_CREATED + name);
+                System.out.println(ConsoleOutput.NEW_FILE_CREATED.toString() + " " + name);
             }
         } catch (RemoteException e) {
             System.out.println("Error: " + e.getMessage());
         }
     }
 
-    private void list() {
+    private String list() {
         try {
             String fileList = FileSystemStub.list();
             System.out.println(fileList);
+
+            return fileList;
         } catch (RemoteException e) {
             System.out.println("Error: " + e.getMessage());
         }
+        return null;
     }
 
     private void syncLocalDirectory() {
@@ -164,7 +167,7 @@ public class Client {
 
     private void get(String name) {
         if (name == "") {
-            System.out.println(ConsoleOutput.INVALID_FILE_NAME);
+            System.out.println(ConsoleOutput.INVALID_FILE_NAME.toString());
             return;
         }
 
@@ -191,12 +194,12 @@ public class Client {
         }
 
         if (fileContent == null && isAlreadyInDirectory)
-            System.out.println(ConsoleOutput.CONTENT_IS_ALREADY_UP_TO_DATE);
+            System.out.println(ConsoleOutput.CONTENT_IS_ALREADY_UP_TO_DATE.toString());
         else {
             try {
                 PrintWriter writer = new PrintWriter(f);
                 writer.print(fileContent);
-                System.out.println(ConsoleOutput.CONTENT_UPDATED);
+                System.out.println(ConsoleOutput.CONTENT_UPDATED.toString());
             } catch (FileNotFoundException e) {
                 System.out.println("Error: " + e.getMessage());
             }
@@ -204,11 +207,49 @@ public class Client {
     }
 
     private void lock(String name) {
+        if (name == "") {
+            System.out.println(ConsoleOutput.INVALID_FILE_NAME.toString());
+            return;
+        }
 
+        //Is file stored server side
+        var filesOnServer = list();
+        if (!filesOnServer.contains(name)) {
+            System.out.println(ConsoleOutput.FILE_404.toString());
+        }
+
+        //Is file stored client side
+        File f = new File(PathClientFiles + "/" + name);
+        String checksum = null;
+        String content = getClientFileContent(name);
+        if (!f.exists()) {
+            try {
+                FileSystemStub.lock(new Document(name, null, content));
+            } catch (RemoteException e) {
+                System.out.println("Error: " + e.getMessage());
+            }
+        } else {
+            checksum = computeChecksum(name);
+        }
     }
 
     private void push(String name) {
+        if (name == "") {
+            System.out.println(ConsoleOutput.INVALID_FILE_NAME.toString());
+            return;
+        }
 
+        boolean hasBeenPushed = false;
+        String content = getClientFileContent(name);
+
+        try {
+            hasBeenPushed = FileSystemStub.push(new Document(name, null, content));
+        } catch (RemoteException e) {
+            System.out.println("Error: " + e.getMessage());
+        }
+
+        ConsoleOutput output = hasBeenPushed ? ConsoleOutput.PUSHED_ACCEPTED : ConsoleOutput.PUSHED_DENIED;
+        System.out.println(output.toString());
     }
 
     private void writeToClientList(Credentials credentials) {
@@ -220,16 +261,19 @@ public class Client {
         }
     }
 
-    private String computeChecksum(String fileName) {
-        String fileContent = "";
-        byte[] content = new byte[1024];
-        MessageDigest md = null;
-
+    private String getClientFileContent(String fileName) {
         try {
-            fileContent = new String(Files.readAllBytes(Paths.get(PathClientFiles + "/" + fileName)));
+            return new String(Files.readAllBytes(Paths.get(PathClientFiles + "/" + fileName)));
         } catch (IOException e) {
             System.out.println("Error: " + e.getMessage());
         }
+        return null;
+    }
+
+    private String computeChecksum(String fileName) {
+        String fileContent = getClientFileContent(fileName);
+        byte[] content = new byte[1024];
+        MessageDigest md = null;
 
         try {
             content = fileContent.getBytes("UTF-8");

@@ -4,10 +4,12 @@ public class Document {
 
     public String name;
     public String checksum;
+    public String content;
 
-    public Document(String name, String checksum){
+    public Document(String name, String checksum, String content){
         this.name = name;
-        this.checksum = checksum;
+        this.checksum = checksum ;
+        this.content = content;
     }
 
     @Override

@@ -9,6 +9,6 @@ public interface FileSystemInterface extends Remote, ServerInterface {
     String list() throws RemoteException;
     //SyncLocalDirectory
     String get(String name, String checksum) throws RemoteException;
-    //Lock
-    //Puh
+    boolean lock(Document file) throws RemoteException;
+    boolean push(Document file) throws RemoteException;
 }
