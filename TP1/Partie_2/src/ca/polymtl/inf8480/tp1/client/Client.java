@@ -227,7 +227,7 @@ public class Client {
             return;
         }
 
-        File f = new File(pathClientFiles + "/" + name);
+        File f = new File(pathClientFiles + "/" + name + ".txt");
         boolean isAlreadyInDirectory = f.exists();
         String fileContent = "";
         String checksum = null;
@@ -253,6 +253,7 @@ public class Client {
             System.out.println(ConsoleOutput.CONTENT_IS_ALREADY_UP_TO_DATE.toString());
         else {
             try {
+                System.out.println("Content from server : " + fileContent);
                 PrintWriter writer = new PrintWriter(f);
                 writer.print(fileContent);
                 System.out.println(ConsoleOutput.CONTENT_UPDATED.toString());
