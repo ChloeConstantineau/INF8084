@@ -7,13 +7,14 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
+import java.util.HashMap;
 import java.util.HashSet;
 
 import ca.polymtl.inf8480.tp1.shared.*;
 
 public class ServerAuth implements AuthenticationInterface {
 
-    private HashSet<Credentials> credentialsSet = new HashSet<>();
+    private HashMap<String, String> credentialMap = new HashMap<>();
     private FileSystemInterface fileSystemStub;
     private final String PATH = "./ServerSide/ClientList.txt";
     private final String SERVERHOST_NAME = "127.0.0.1";
@@ -101,11 +102,11 @@ public class ServerAuth implements AuthenticationInterface {
     private void addCredientials(String s){
 	    String username = s.substring(0, s.indexOf("@"));
 	    String password = s.substring(s.indexOf("@") + 1, s.length());
-	    credentialsSet.add(new Credentials(username, password));
+	    credentialMap.put(username, password);
     }
 
     private void addCredentials(Credentials credentials){
-        credentialsSet.add(credentials);
+        credentialMap.put(credentials.username, credentials.password);
         try {
             writeToFile(credentials);
         } catch (IOException e){
@@ -120,7 +121,7 @@ public class ServerAuth implements AuthenticationInterface {
 	public boolean newClient(Credentials credentials) throws RemoteException {
 	    System.out.println("New client requested");
 
-	    if(credentialsSet.contains(credentials)){
+        if(credentialMap.containsKey(credentials.username)){
             System.out.println("Client already exists");
 	        return false;
         }
@@ -132,7 +133,10 @@ public class ServerAuth implements AuthenticationInterface {
 
     public boolean verifyClient(Credentials credentials) throws RemoteException {
         System.out.println("New client verification requested");
-	    return credentialsSet.contains(credentials);
+        String name = credentials.username;
+        String password = credentials.password;
+
+        return credentialMap.containsKey(name) && credentialMap.get(name).equals(password);
     }
 
 }

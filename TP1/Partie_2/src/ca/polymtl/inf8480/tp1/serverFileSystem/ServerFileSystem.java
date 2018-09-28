@@ -19,7 +19,10 @@ import ca.polymtl.inf8480.tp1.shared.*;
 
 public class ServerFileSystem implements FileSystemInterface {
 
+    // <document name, document checksum>
     private HashMap<String, String> documentsMap = new HashMap<>();
+    // <document name, lock owner name>
+    private HashMap<String, String> lockedDocuments = new HashMap<>();
     private AuthenticationInterface authServerStub;
 
     private final String DIRECTORY_NAME = "./ServerSide/Files/";
@@ -91,15 +94,18 @@ public class ServerFileSystem implements FileSystemInterface {
 //        writer.close();
     }
 
-    private void readFromFile() throws  IOException {
-//        String path = "./ServerSide/ClientList.txt";
-//        File file = new File(path);
-//        BufferedReader br = new BufferedReader(new FileReader(file));
-//
-//        String str;
-//        while ((str = br.readLine()) != null){
-//            // TODO : Something
-//        }
+    private String readFile(String name) throws  IOException {
+        String path = DIRECTORY_NAME + name + ".txt";
+        File file = new File(path);
+        BufferedReader br = new BufferedReader(new FileReader(file));
+
+        StringBuilder sc = new StringBuilder();
+
+        String str;
+        while ((str = br.readLine()) != null){
+            sc.append(str);
+        }
+        return sc.toString();
     }
 
     private void listFiles() {
@@ -176,15 +182,8 @@ public class ServerFileSystem implements FileSystemInterface {
      * Méthode accessible par RMI.
      */
     public boolean create(Credentials credentials, String name) throws RemoteException {
-        System.out.println("Document creation requested");
 
-        if(!authServerStub.verifyClient(credentials)){
-            System.out.println("Credentials denied");
-            return false;
-        }
-
-        if(documentsMap.containsKey(name)){
-            System.out.println("Document already exists");
+        if(!authServerStub.verifyClient(credentials) || documentsMap.containsKey(name)){
             return false;
         }
 
@@ -208,32 +207,67 @@ public class ServerFileSystem implements FileSystemInterface {
     }
 
     public String list(Credentials credentials) throws RemoteException {
-//        Retourne la liste des fichiers présents sur le
-//        serveur. Pour chaque fichier, le nom et l'identifiant
-//        du client possédant le verrou (le cas échéant) est
-//        retourné.
         if(!authServerStub.verifyClient(credentials)){
             return null;
         }
 
-        Set<String> names = documentsMap.keySet();
-        for(String name : names){
-            System.out.println(name);
+        StringBuilder sc = new StringBuilder();
+        for(String name : documentsMap.keySet()){
+            if(name.charAt(0) != '.'){
+                sc.append(name);
+                if(lockedDocuments.containsKey(name)){
+                    sc.append(", locked by user " + lockedDocuments.get(name));
+                }
+                sc.append('\n');
+            }
         }
 
-        return null;
+        return sc.toString();
     }
 
     public String get(Credentials credentials, String name, String checksum) throws RemoteException {
-        if(!authServerStub.verifyClient(credentials)){
+        // credentials not good or document doesn't exists
+        if(!authServerStub.verifyClient(credentials) || !documentsMap.containsKey(name)){
             return null;
         }
-        return null;
+
+        // if checksum of file on server is the same as client checksum
+        if(documentsMap.get(name).equals(checksum)){
+            return null;
+        }
+
+        String content = null;
+        try {
+            content = readFile(name);
+        } catch (IOException e){
+            System.err.println("Error: " + e.getMessage());
+        }
+
+        return content;
     }
 
-     public boolean lock(Credentials credentials, Document file) throws RemoteException {
+    // same as a pull, sends the server version of the file
+     public Lock lock(Credentials credentials, Document file) throws RemoteException {
+         if(!authServerStub.verifyClient(credentials) || !documentsMap.containsKey(file.name)){
+             return new Lock(false, ConsoleOutput.FILE_404.toString());
+         }
 
-        return true;
+         if(lockedDocuments.containsKey(file.name)){
+             String message = ConsoleOutput.FILE_ALREADY_LOCKED.toString() + lockedDocuments.get(file.name);
+             return new Lock(false, message);
+         }
+
+         // send most recent version of the file to the client
+         String content = null;
+         try {
+             content = readFile(file.name);
+         } catch (IOException e){
+             System.err.println("Error: " + e.getMessage());
+         }
+
+
+         lockedDocuments.put(file.name, credentials.username);
+         return new Lock(true, content);
      }
 
      public boolean push(Credentials credentials, Document file) throws RemoteException {

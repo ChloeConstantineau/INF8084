@@ -98,5 +98,11 @@ public enum ConsoleOutput {
         public String toString() {
             return "File not found on server.";
         }
-    }
+    },
+    FILE_ALREADY_LOCKED {
+        @Override
+        public String toString() {
+            return "File already locked by user";
+        }
+    },
 }

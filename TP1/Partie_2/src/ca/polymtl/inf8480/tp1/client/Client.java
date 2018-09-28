@@ -123,7 +123,7 @@ public class Client {
             boolean isAuthSuccessful = isNewClient ? authServerStub.newClient(loginAttempt) : authServerStub.verifyClient(loginAttempt);
 
             if (isAuthSuccessful) {
-                SetCurrentUser(loginAttempt);
+                setCurrentUser(loginAttempt);
                 if (isNewClient) {
                     writeToClientList(loginAttempt);
                     System.out.println(ConsoleOutput.REGISTRATION_APPROVED.toString());
@@ -315,11 +315,11 @@ public class Client {
         return null;
     }
 
-    private void SetCurrentUser(Credentials credentials) {
+    private void setCurrentUser(Credentials credentials) {
         String str = credentials.username + "@" + credentials.password;
         BufferedWriter writer;
         try {
-            writer = new BufferedWriter(new FileWriter(pathCurrentUser, true));
+            writer = new BufferedWriter(new FileWriter(pathCurrentUser, false));
             writer.write(str);
             writer.close();
         } catch (IOException e) {
