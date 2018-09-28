@@ -23,7 +23,6 @@ public class Client {
     private String pathClientFiles = "ClientSide/Files/";
     private String pathClientList = "ClientSide/ClientList.txt";
     private String pathCurrentUser = "ClientSide/CurrentUser.txt";
-    private Credentials credentials = null;
 
     public static void main(String[] args) {
         String localHostname = "127.0.0.1";
@@ -164,6 +163,12 @@ public class Client {
     }
 
     private String list() {
+        Credentials credentials = getCurrentUser();
+        if(credentials == null){
+            System.out.println(ConsoleOutput.INVALID_CREDENTIALS.toString());
+            return null;
+        }
+
         try {
             String fileList = fileSystemStub.list(credentials);
             System.out.println(fileList);
@@ -189,6 +194,11 @@ public class Client {
     private void get(String name) {
         if (name == "") {
             System.out.println(ConsoleOutput.INVALID_FILE_NAME.toString());
+            return;
+        }
+        Credentials credentials = getCurrentUser();
+        if(credentials == null){
+            System.out.println(ConsoleOutput.INVALID_CREDENTIALS.toString());
             return;
         }
 
@@ -232,6 +242,12 @@ public class Client {
             System.out.println(ConsoleOutput.INVALID_FILE_NAME.toString());
             return;
         }
+        Credentials credentials = getCurrentUser();
+        if(credentials == null){
+            System.out.println(ConsoleOutput.INVALID_CREDENTIALS.toString());
+            return;
+        }
+
 
         //Is file stored server side
         String filesOnServer = list();
@@ -257,6 +273,11 @@ public class Client {
     private void push(String name) {
         if (name == "") {
             System.out.println(ConsoleOutput.INVALID_FILE_NAME.toString());
+            return;
+        }
+        Credentials credentials = getCurrentUser();
+        if(credentials == null){
+            System.out.println(ConsoleOutput.INVALID_CREDENTIALS.toString());
             return;
         }
 
