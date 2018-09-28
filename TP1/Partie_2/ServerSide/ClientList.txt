@@ -1,2 +1,4 @@
 vero@password
 chloe@password
+admin@admin123
+admin@123

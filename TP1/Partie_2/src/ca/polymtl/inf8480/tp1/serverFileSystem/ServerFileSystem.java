@@ -13,9 +13,7 @@ import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 import ca.polymtl.inf8480.tp1.shared.*;
 
@@ -177,8 +175,16 @@ public class ServerFileSystem implements FileSystemInterface {
     /*
      * Méthode accessible par RMI.
      */
-    public boolean create(String name) throws RemoteException {
+    public boolean create(Credentials credentials, String name) throws RemoteException {
+        System.out.println("Document creation requested");
+
+        if(!authServerStub.verifyClient(credentials)){
+            System.out.println("Credentials denied");
+            return false;
+        }
+
         if(documentsMap.containsKey(name)){
+            System.out.println("Document already exists");
             return false;
         }
 
@@ -197,26 +203,40 @@ public class ServerFileSystem implements FileSystemInterface {
             System.err.println("Error: " + e.getMessage());
         }
 
+        System.out.println("Document created");
         return true;
     }
 
-    public String list() throws RemoteException {
+    public String list(Credentials credentials) throws RemoteException {
+//        Retourne la liste des fichiers présents sur le
+//        serveur. Pour chaque fichier, le nom et l'identifiant
+//        du client possédant le verrou (le cas échéant) est
+//        retourné.
+        if(!authServerStub.verifyClient(credentials)){
+            return null;
+        }
+
+        Set<String> names = documentsMap.keySet();
+        for(String name : names){
+            System.out.println(name);
+        }
+
         return null;
     }
 
-    public String get(String name, String checksum) throws RemoteException {
+    public String get(Credentials credentials, String name, String checksum) throws RemoteException {
+        if(!authServerStub.verifyClient(credentials)){
+            return null;
+        }
         return null;
     }
 
-    public boolean push(String name, String content) throws RemoteException {
-        return false;
-    }
+     public boolean lock(Credentials credentials, Document file) throws RemoteException {
 
-     public boolean lock(Document file) throws RemoteException {
         return true;
      }
 
-     public boolean push(Document file) throws RemoteException {
+     public boolean push(Credentials credentials, Document file) throws RemoteException {
         return true;
      }
 }
