@@ -11,6 +11,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 import java.nio.file.Files;
+import java.util.List;
 
 import ca.polymtl.inf8480.tp1.shared.*;
 
@@ -82,20 +83,28 @@ public class Client {
         switch (functionName) {
             case "new":
                 identifyClient(param[0], param[1], true);
+                break;
             case "verify":
                 identifyClient(param[0], param[1], false);
+                break;
             case "create":
-                create(param[0]);
+                create(param[1]);
+                break;
             case "list":
                 list();
+                break;
             case "syncLocalDirectory":
                 syncLocalDirectory();
+                break;
             case "get":
                 get(param[0]);
+                break;
             case "lock":
                 lock(param[0]);
+                break;
             case "push":
                 push(param[0]);
+                break;
         }
     }
 
@@ -213,7 +222,7 @@ public class Client {
         }
 
         //Is file stored server side
-        var filesOnServer = list();
+        String filesOnServer = list();
         if (!filesOnServer.contains(name)) {
             System.out.println(ConsoleOutput.FILE_404.toString());
         }

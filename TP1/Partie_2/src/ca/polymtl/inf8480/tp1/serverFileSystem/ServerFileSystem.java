@@ -6,6 +6,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.rmi.ConnectException;
+import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
@@ -14,17 +15,17 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 
-import ca.polymtl.inf8480.tp1.shared.Credentials;
-import ca.polymtl.inf8480.tp1.shared.Document;
-import ca.polymtl.inf8480.tp1.shared.FileSystemInterface;
+import ca.polymtl.inf8480.tp1.shared.*;
 
 public class ServerFileSystem implements FileSystemInterface {
 
-    HashMap<String, String> documentsMap = new HashMap<>();
-    final String DIRECTORY_NAME = "./ServerSide/Files/";
+    private HashMap<String, String> documentsMap = new HashMap<>();
+    private AuthenticationInterface authServerStub;
+
+    private final String DIRECTORY_NAME = "./ServerSide/Files/";
+    private final String SERVERHOST_NAME = "127.0.0.1";
 
 
     public static void main(String[] args) {
@@ -34,6 +35,27 @@ public class ServerFileSystem implements FileSystemInterface {
 
     public ServerFileSystem() {
         super();
+
+        if (System.getSecurityManager() == null) {
+            System.setSecurityManager(new SecurityManager());
+        }
+        authServerStub = (AuthenticationInterface) loadServerStub(SERVERHOST_NAME, "serverAuth");
+
+    }
+
+    private ServerInterface loadServerStub(String hostname, String registryName) {
+        ServerInterface stub = null;
+
+        try {
+            Registry registry = LocateRegistry.getRegistry(hostname);
+            stub = (ServerInterface) registry.lookup(registryName);
+        } catch (NotBoundException e) {
+            System.out.println(ConsoleOutput.REGISTRY_NOT_FOUND.toString());
+        } catch (RemoteException e) {
+            System.out.println("Error: " + e.getMessage());
+        }
+
+        return stub;
     }
 
     private void run() {
@@ -189,4 +211,12 @@ public class ServerFileSystem implements FileSystemInterface {
     public boolean push(String name, String content) throws RemoteException {
         return false;
     }
+
+     public boolean lock(Document file) throws RemoteException {
+        return true;
+     }
+
+     public boolean push(Document file) throws RemoteException {
+        return true;
+     }
 }
