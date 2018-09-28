@@ -33,14 +33,14 @@ public enum ConsoleOutput {
     REGISTRATION_DENIED{
         @Override
         public String toString() {
-            return "The client was successfully registered.";
+            return "The server was unable to register the client";
         }
     },
 
     REGISTRATION_APPROVED{
         @Override
         public String toString() {
-            return "The server was unable to register the client";
+            return "he client was successfully registered.";
         }
     },
 

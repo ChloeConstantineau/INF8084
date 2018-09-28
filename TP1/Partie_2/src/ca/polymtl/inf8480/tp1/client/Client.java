@@ -70,7 +70,7 @@ public class Client {
             Registry registry = LocateRegistry.getRegistry(hostname);
             stub = (ServerInterface) registry.lookup(registryName);
         } catch (NotBoundException e) {
-            System.out.println(ConsoleOutput.REGISTRY_NOT_FOUND.toString());
+            System.out.println(ConsoleOutput.REGISTRY_NOT_FOUND.toString() + " : " + registryName);
         } catch (RemoteException e) {
             System.out.println("Error: " + e.getMessage());
         }
