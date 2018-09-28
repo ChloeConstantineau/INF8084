@@ -175,17 +175,29 @@ public class Client {
         }
     }
 
-    private String list() {
+    private void list() {
         Credentials credentials = getCurrentUser();
         if(credentials == null){
             System.out.println(ConsoleOutput.INVALID_CREDENTIALS.toString());
-            return null;
         }
 
         try {
             String fileList = fileSystemStub.list(credentials);
             System.out.println(fileList);
 
+        } catch (RemoteException e) {
+            System.out.println("Error: " + e.getMessage());
+        }
+    }
+
+    private String getList() {
+        Credentials credentials = getCurrentUser();
+        if(credentials == null){
+            return null;
+        }
+
+        try {
+            String fileList = fileSystemStub.list(credentials);
             return fileList;
         } catch (RemoteException e) {
             System.out.println("Error: " + e.getMessage());
@@ -261,9 +273,8 @@ public class Client {
             return;
         }
 
-
         //Is file stored server side
-        String filesOnServer = list();
+        String filesOnServer = getList();
         if (!filesOnServer.contains(name)) {
             System.out.println(ConsoleOutput.FILE_404.toString());
         }
