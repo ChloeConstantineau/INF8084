@@ -5,7 +5,7 @@ public enum ConsoleOutput {
     REGISTRY_NOT_FOUND {
         @Override
         public String toString() {
-            return "The given name was not found in the registry.";
+            return "The given registry name was not found.";
         }
     },
 
@@ -27,6 +27,20 @@ public enum ConsoleOutput {
         @Override
         public String toString() {
             return "The client was successfully authenticated.";
+        }
+    },
+
+    REGISTRATION_DENIED{
+        @Override
+        public String toString() {
+            return "The client was successfully registered.";
+        }
+    },
+
+    REGISTRATION_APPROVED{
+        @Override
+        public String toString() {
+            return "The server was unable to register the client";
         }
     },
 

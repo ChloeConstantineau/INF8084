@@ -5,10 +5,10 @@ import java.rmi.RemoteException;
 
 public interface FileSystemInterface extends Remote, ServerInterface {
     //**File server**//
-    boolean create(String name) throws RemoteException;
-    String list() throws RemoteException;
+    boolean create(Credentials credentials, String name) throws RemoteException;
+    String list(Credentials credentials) throws RemoteException;
     //SyncLocalDirectory
-    String get(String name, String checksum) throws RemoteException;
-    boolean lock(Document file) throws RemoteException;
-    boolean push(Document file) throws RemoteException;
+    String get(Credentials credentials, String name, String checksum) throws RemoteException;
+    boolean lock(Credentials credentials, Document file) throws RemoteException;
+    boolean push(Credentials credentials, Document file) throws RemoteException;
 }

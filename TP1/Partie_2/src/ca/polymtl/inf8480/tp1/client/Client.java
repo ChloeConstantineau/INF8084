@@ -19,11 +19,11 @@ public class Client {
 
     private static String functionName;
     private static String[] param;
-    private AuthenticationInterface AuthServerStub;
-    private FileSystemInterface FileSystemStub;
-    private String PathClientFiles = "ClientSide/Files/";
-    private String PathClientList = "ClientSide/ClientList.txt";
-    private Credentials credentials;
+    private AuthenticationInterface authServerStub;
+    private FileSystemInterface fileSystemStub;
+    private String pathClientFiles = "ClientSide/Files/";
+    private String pathClientList = "ClientSide/ClientList.txt";
+    private Credentials credentials = null;
 
     public static void main(String[] args) {
         String localHostname = "127.0.0.1";
@@ -52,12 +52,12 @@ public class Client {
         if (System.getSecurityManager() == null) {
             System.setSecurityManager(new SecurityManager());
         }
-        AuthServerStub = (AuthenticationInterface) loadServerStub(serverHostname, "serverAuth");
-        FileSystemStub = (FileSystemInterface) loadServerStub(serverHostname, "serverFileSystem");
+        authServerStub = (AuthenticationInterface) loadServerStub(serverHostname, "serverAuth");
+        fileSystemStub = (FileSystemInterface) loadServerStub(serverHostname, "serverFileSystem");
     }
 
     private void run() {
-        if (AuthServerStub != null) {
+        if (authServerStub != null) {
             executeCall();
         }
     }
@@ -82,20 +82,31 @@ public class Client {
         switch (functionName) {
             case "new":
                 identifyClient(param[0], param[1], true);
+                break;
             case "verify":
                 identifyClient(param[0], param[1], false);
+                break;
             case "create":
-                create(param[0]);
+                create(param[1]);
+                break;
             case "list":
                 list();
+                break;
             case "syncLocalDirectory":
                 syncLocalDirectory();
+                break;
             case "get":
                 get(param[0]);
+                break;
             case "lock":
                 lock(param[0]);
+                break;
             case "push":
                 push(param[0]);
+                break;
+            default:
+                System.out.println(ConsoleOutput.INVALID_FUNCTION_CALL.toString());
+                break;
         }
     }
 
@@ -108,18 +119,22 @@ public class Client {
         Credentials loginAttempt = new Credentials(username, password);
 
         try {
-            boolean isAuthSuccessful = isNewClient ? AuthServerStub.newClient(loginAttempt) : AuthServerStub.verifyClient(loginAttempt);
+            boolean isAuthSuccessful = isNewClient ? authServerStub.newClient(loginAttempt) : authServerStub.verifyClient(loginAttempt);
 
             if (isAuthSuccessful) {
                 this.credentials = loginAttempt;
 
                 if (isNewClient) {
                     writeToClientList(credentials);
-                }
-                System.out.println(ConsoleOutput.AUTH_APPROVED.toString());
+                    System.out.println(ConsoleOutput.REGISTRATION_APPROVED.toString());
+                } else
+                    System.out.println(ConsoleOutput.AUTH_APPROVED.toString());
 
             } else {
-                System.out.println(ConsoleOutput.AUTH_DENIED.toString());
+                if(isNewClient)
+                System.out.println(ConsoleOutput.REGISTRATION_DENIED.toString());
+                else
+                    System.out.println(ConsoleOutput.AUTH_DENIED.toString());
             }
 
         } catch (RemoteException e) {
@@ -128,13 +143,13 @@ public class Client {
     }
 
     private void create(String name) {
-        if (name == "") {
+        if (name == "" || credentials == null) {
             System.out.println(ConsoleOutput.INVALID_FILE_NAME.toString());
             return;
         }
 
         try {
-            if (FileSystemStub.create(name)) {
+            if (fileSystemStub.create(credentials, name)) {
                 System.out.println(ConsoleOutput.NEW_FILE_CREATED.toString() + " " + name);
             }
         } catch (RemoteException e) {
@@ -144,7 +159,7 @@ public class Client {
 
     private String list() {
         try {
-            String fileList = FileSystemStub.list();
+            String fileList = fileSystemStub.list(credentials);
             System.out.println(fileList);
 
             return fileList;
@@ -156,7 +171,7 @@ public class Client {
 
     private void syncLocalDirectory() {
 
-//        File folder = new File(PathClientFiles);
+//        File folder = new File(pathClientFiles);
 //        File[] listOfFiles = folder.listFiles();
 //
 //        for (int i = 0; i < listOfFiles.length; i++)
@@ -171,7 +186,7 @@ public class Client {
             return;
         }
 
-        File f = new File(PathClientFiles + "/" + name);
+        File f = new File(pathClientFiles + "/" + name);
         boolean isAlreadyInDirectory = f.exists();
         String fileContent = "";
         String checksum = null;
@@ -187,7 +202,7 @@ public class Client {
         }
 
         try {
-            fileContent = FileSystemStub.get(name, checksum);
+            fileContent = fileSystemStub.get(credentials, name, checksum);
 
         } catch (RemoteException e) {
             System.out.println(e.getMessage());
@@ -219,12 +234,12 @@ public class Client {
         }
 
         //Is file stored client side
-        File f = new File(PathClientFiles + "/" + name);
+        File f = new File(pathClientFiles + "/" + name);
         String checksum = null;
         String content = getClientFileContent(name);
         if (!f.exists()) {
             try {
-                FileSystemStub.lock(new Document(name, null, content));
+                fileSystemStub.lock(credentials, new Document(name, null, content));
             } catch (RemoteException e) {
                 System.out.println("Error: " + e.getMessage());
             }
@@ -243,7 +258,7 @@ public class Client {
         String content = getClientFileContent(name);
 
         try {
-            hasBeenPushed = FileSystemStub.push(new Document(name, null, content));
+            hasBeenPushed = fileSystemStub.push(credentials, new Document(name, null, content));
         } catch (RemoteException e) {
             System.out.println("Error: " + e.getMessage());
         }
@@ -255,7 +270,7 @@ public class Client {
     private void writeToClientList(Credentials credentials) {
         String text = credentials.username + ", " + credentials.password;
         try {
-            Files.write(Paths.get(PathClientList), text.getBytes(), StandardOpenOption.APPEND);
+            Files.write(Paths.get(pathClientList), text.getBytes(), StandardOpenOption.APPEND);
         } catch (IOException e) {
             System.out.println("Error: " + e.getMessage());
         }
@@ -263,7 +278,7 @@ public class Client {
 
     private String getClientFileContent(String fileName) {
         try {
-            return new String(Files.readAllBytes(Paths.get(PathClientFiles + "/" + fileName)));
+            return new String(Files.readAllBytes(Paths.get(pathClientFiles + "/" + fileName)));
         } catch (IOException e) {
             System.out.println("Error: " + e.getMessage());
         }
