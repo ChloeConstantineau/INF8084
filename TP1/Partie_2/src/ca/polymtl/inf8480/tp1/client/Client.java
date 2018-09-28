@@ -144,8 +144,11 @@ public class Client {
     }
 
     private void create(String name) {
-        if (name == "" || credentials == null) {
+        if (name == "") {
             System.out.println(ConsoleOutput.INVALID_FILE_NAME.toString());
+            return;
+        }else if(credentials == null){
+            System.out.println(ConsoleOutput.INVALID_CREDENTIALS.toString());
             return;
         }
 
@@ -269,10 +272,14 @@ public class Client {
     }
 
     private void writeToClientList(Credentials credentials) {
-        String text = credentials.username + ", " + credentials.password;
-        try {
-            Files.write(Paths.get(pathClientList), text.getBytes(), StandardOpenOption.APPEND);
-        } catch (IOException e) {
+        String str = credentials.username + "@" + credentials.password;
+        BufferedWriter writer;
+        try{
+            writer = new BufferedWriter(new FileWriter(pathClientList, true));
+            writer.append(str + '\n');
+            writer.close();
+        }
+        catch(IOException e){
             System.out.println("Error: " + e.getMessage());
         }
     }

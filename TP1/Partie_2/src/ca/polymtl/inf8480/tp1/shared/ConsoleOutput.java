@@ -30,14 +30,14 @@ public enum ConsoleOutput {
         }
     },
 
-    REGISTRATION_DENIED{
+    REGISTRATION_DENIED {
         @Override
         public String toString() {
             return "The server was unable to register the client";
         }
     },
 
-    REGISTRATION_APPROVED{
+    REGISTRATION_APPROVED {
         @Override
         public String toString() {
             return "he client was successfully registered.";
@@ -48,6 +48,13 @@ public enum ConsoleOutput {
         @Override
         public String toString() {
             return "File name invalid.";
+        }
+    },
+
+    INVALID_CREDENTIALS {
+        @Override
+        public String toString() {
+            return "Invalid credentials.";
         }
     },
 
@@ -79,14 +86,14 @@ public enum ConsoleOutput {
         }
     },
 
-    PUSHED_ACCEPTED{
+    PUSHED_ACCEPTED {
         @Override
         public String toString() {
             return "Push successful";
         }
     },
 
-    FILE_404{
+    FILE_404 {
         @Override
         public String toString() {
             return "File not found on server.";
