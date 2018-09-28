@@ -23,7 +23,7 @@ public class Client {
     private static String[] param;
     private AuthenticationInterface authServerStub;
     private FileSystemInterface fileSystemStub;
-    private String pathClientFiles = "ClientSide/Files/";
+    private String pathClientFiles = "ClientSide/Files";
     private String pathClientList = "ClientSide/ClientList.txt";
     private String pathCurrentUser = "ClientSide/CurrentUser.txt";
 
@@ -159,7 +159,7 @@ public class Client {
 
         try {
             if (fileSystemStub.create(credentials, name)) {
-                Path file = Paths.get(pathClientFiles + name + ".txt");
+                Path file = Paths.get(pathClientFiles + "/" + name + ".txt");
                 List<String> s = Arrays.asList("");
 
                 try {
@@ -281,7 +281,7 @@ public class Client {
         }
 
         //Is file stored client side
-        File f = new File(pathClientFiles + "/" + name);
+        File f = new File(pathClientFiles + "/" + name + ".txt");
         String checksum = null;
         String content = getFileContent(name);
         if (!f.exists()) {
@@ -333,7 +333,7 @@ public class Client {
 
     private String getFileContent(String fileName) {
         try {
-            return new String(Files.readAllBytes(Paths.get(pathClientFiles + "/" + fileName)));
+            return new String(Files.readAllBytes(Paths.get(pathClientFiles + "/" + fileName + ".txt")));
         } catch (IOException e) {
             System.out.println("Error: " + e.getMessage());
         }
