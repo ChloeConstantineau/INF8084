@@ -124,12 +124,7 @@ public class Client {
             boolean isAuthSuccessful = isNewClient ? authServerStub.newClient(loginAttempt) : authServerStub.verifyClient(loginAttempt);
 
             if (isAuthSuccessful) {
-<<<<<<< HEAD
-                credentials = new Credentials(loginAttempt.username, loginAttempt.password);
-
-=======
                 SetCurrentUser(loginAttempt);
->>>>>>> c10850d836e791d30033abf92c9f02a077c90c93
                 if (isNewClient) {
                     writeToClientList(loginAttempt);
                     System.out.println(ConsoleOutput.REGISTRATION_APPROVED.toString());
@@ -152,13 +147,9 @@ public class Client {
         if (name == "") {
             System.out.println(ConsoleOutput.INVALID_FILE_NAME.toString());
             return;
-<<<<<<< HEAD
-        } else if(credentials == null){
-=======
         }
         Credentials credentials = getCurrentUser();
         if(credentials == null){
->>>>>>> c10850d836e791d30033abf92c9f02a077c90c93
             System.out.println(ConsoleOutput.INVALID_CREDENTIALS.toString());
             return;
         }
