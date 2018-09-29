@@ -95,7 +95,7 @@ public class ServerFileSystem implements FileSystemInterface {
     }
 
     private String readFile(String name) throws  IOException {
-        String path = DIRECTORY_NAME + name + ".txt";
+        String path = DIRECTORY_NAME + name;
         File file = new File(path);
         BufferedReader br = new BufferedReader(new FileReader(file));
 
@@ -103,9 +103,12 @@ public class ServerFileSystem implements FileSystemInterface {
 
         String str;
         while ((str = br.readLine()) != null){
-            sc.append(str);
+            sc.append(str + '\n');
         }
-        return sc.toString();
+
+        // remove last '\n'
+        String s = sc.toString();
+        return s.substring(0, s.length() - 1);
     }
 
     private void listFiles() {
@@ -187,7 +190,7 @@ public class ServerFileSystem implements FileSystemInterface {
             return false;
         }
 
-        Path file = Paths.get(DIRECTORY_NAME + name + ".txt");
+        Path file = Paths.get(DIRECTORY_NAME + name);
         List<String> s = Arrays.asList("");
 
         try {
@@ -228,20 +231,28 @@ public class ServerFileSystem implements FileSystemInterface {
     public String get(Credentials credentials, String name, String checksum) throws RemoteException {
         // credentials not good or document doesn't exists
         if(!authServerStub.verifyClient(credentials) || !documentsMap.containsKey(name)){
+            System.out.println("No document of that name here");
             return null;
         }
 
         // if checksum of file on server is the same as client checksum
+        System.out.println("Server checksum : " + documentsMap.get(name));
+        System.out.println("Client checksum : " + checksum);
+
         if(documentsMap.get(name).equals(checksum)){
+            System.out.println("Same checksum");
             return null;
         }
 
         String content = null;
         try {
+            System.out.println("Getting Content");
             content = readFile(name);
         } catch (IOException e){
             System.err.println("Error: " + e.getMessage());
         }
+
+        System.out.println("Content : " + content);
 
         return content;
     }
