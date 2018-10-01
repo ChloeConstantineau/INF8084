@@ -10,12 +10,12 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.Arrays;
+import java.util.*;
 import java.nio.file.Files;
-import java.util.HashSet;
-import java.util.List;
 
 import ca.polymtl.inf8480.tp1.shared.*;
+
+import javax.print.Doc;
 
 
 public class Client {
@@ -24,7 +24,7 @@ public class Client {
     private static String[] param;
     private AuthenticationInterface authServerStub;
     private FileSystemInterface fileSystemStub;
-    private String pathClientFiles = "ClientSide/Files";
+    private String pathClientFiles = "ClientSide/Files/";
     private String pathClientList = "ClientSide/ClientList.txt";
     private String pathCurrentUser = "ClientSide/CurrentUser.txt";
 
@@ -160,7 +160,7 @@ public class Client {
 
         try {
             if (fileSystemStub.create(credentials, name)) {
-                Path file = Paths.get(pathClientFiles + "/" + name);
+                Path file = Paths.get(pathClientFiles + name);
                 List<String> s = Arrays.asList("");
 
                 try {
@@ -216,14 +216,30 @@ public class Client {
     }
 
     private void syncLocalDirectory() {
+        Credentials credentials = getCurrentUser();
+        if(credentials == null){
+            System.out.println(ConsoleOutput.INVALID_CREDENTIALS.toString());
+        }
 
-//        File folder = new File(pathClientFiles);
-//        File[] listOfFiles = folder.listFiles();
-//
-//        for (int i = 0; i < listOfFiles.length; i++)
-//            if (listOfFiles[i].isFile()) {
-//                this.get(listOfFiles[i].getName());
-//            }
+        ArrayList<Document> serverDocuments = new ArrayList<>();
+        try {
+            serverDocuments = fileSystemStub.syncLocalDirectory(credentials);
+        } catch (RemoteException e) {
+            System.out.println("Error: " + e.getMessage());
+        }
+
+        Iterator<Document> itr = serverDocuments.iterator();
+        while(itr.hasNext()){
+            Document doc = itr.next();
+            File file = new File(pathClientFiles + doc.name);
+            if(file.exists()){
+                try {
+                    writeToFile(pathClientFiles + doc.name, doc.content);
+                } catch (IOException e){
+                    System.err.println(e.getMessage());
+                }
+            }
+        }
     }
 
     private void writeToFile(String path, String str) throws IOException {
@@ -245,13 +261,13 @@ public class Client {
             return;
         }
 
-        File file = new File(pathClientFiles + "/" + name);
+        File file = new File(pathClientFiles + name);
         String fileContent = "";
         String checksum = null;
 
         if (file.exists()) {
             try {
-                checksum = md5Checksum(pathClientFiles + "/" + name);
+                checksum = md5Checksum(pathClientFiles + name);
             } catch (NoSuchAlgorithmException e){
                 System.err.println("Error: " + e.getMessage());
             }
@@ -274,7 +290,7 @@ public class Client {
             System.out.println(ConsoleOutput.CONTENT_IS_ALREADY_UP_TO_DATE.toString());
         else {
             try{
-                writeToFile(pathClientFiles + "/" + name, fileContent);
+                writeToFile(pathClientFiles + name, fileContent);
             } catch (IOException e){
                 System.err.println(e.getMessage());
             }
@@ -283,7 +299,7 @@ public class Client {
     }
 
     private void createFileLocally(String name){
-        Path file = Paths.get(pathClientFiles + "/" + name);
+        Path file = Paths.get(pathClientFiles + name);
         List<String> s = Arrays.asList("");
 
         try {
@@ -313,7 +329,7 @@ public class Client {
         }
 
         //Is file stored client side
-        File file = new File(pathClientFiles + "/" + name);
+        File file = new File(pathClientFiles + name);
         String checksum = null;
         String content = getFileContent(name);
         Lock lock = null;
@@ -323,7 +339,7 @@ public class Client {
             createFileLocally(name);
             try {
                 lock = (Lock) fileSystemStub.lock(credentials, null);
-                writeToFile(pathClientFiles + "/" + name, lock.message);
+                writeToFile(pathClientFiles + name, lock.message);
             } catch (RemoteException e) {
                 System.out.println("Error: " + e.getMessage());
             } catch (IOException e){
@@ -333,7 +349,7 @@ public class Client {
         } else {
             // get content and write in file
             try {
-                checksum = md5Checksum(pathClientFiles + "/" + name);
+                checksum = md5Checksum(pathClientFiles + name);
             } catch (NoSuchAlgorithmException e) {
                 System.err.println(e.getMessage());
             }
@@ -342,7 +358,7 @@ public class Client {
                 lock = (Lock) fileSystemStub.lock(credentials, name);
                 if(lock.isLocked){
                     try {
-                        writeToFile(pathClientFiles + "/" + name, lock.message);
+                        writeToFile(pathClientFiles + name, lock.message);
                         System.out.println(ConsoleOutput.LOCK_ACCEPTED.toString());
                     } catch (IOException e){
                         System.err.println(e.getMessage());
@@ -402,7 +418,7 @@ public class Client {
 
     private String getFileContent(String fileName) {
         try {
-            return new String(Files.readAllBytes(Paths.get(pathClientFiles + "/" + fileName)));
+            return new String(Files.readAllBytes(Paths.get(pathClientFiles + fileName)));
         } catch (IOException e) {
             System.out.println("Error: " + e.getMessage());
         }

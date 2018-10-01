@@ -297,4 +297,24 @@ public class ServerFileSystem implements FileSystemInterface {
 
         return true;
      }
+
+    public ArrayList<Document> syncLocalDirectory(Credentials credentials) throws RemoteException {
+        if(!authServerStub.verifyClient(credentials)){
+            return null;
+        }
+
+        ArrayList<Document> doccumentArray = new ArrayList<>();
+
+        for(String name : documentsMap.keySet()){
+            if(name.charAt(0) != '.'){
+                try {
+                    Document doc = new Document(name, documentsMap.get(name), readFile(name));
+                    doccumentArray.add(doc);
+                } catch (IOException e){
+                    System.err.println(e.getMessage());
+                }
+            }
+        }
+        return doccumentArray;
+    }
 }
