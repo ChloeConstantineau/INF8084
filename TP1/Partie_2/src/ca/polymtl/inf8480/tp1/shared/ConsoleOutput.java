@@ -82,7 +82,7 @@ public enum ConsoleOutput {
     PUSHED_DENIED {
         @Override
         public String toString() {
-            return "Push denied: The file has to be locked prior to pushing";
+            return "Push denied: The file has to be locked by user prior to pushing";
         }
     },
 
@@ -90,6 +90,13 @@ public enum ConsoleOutput {
         @Override
         public String toString() {
             return "Push successful";
+        }
+    },
+
+    LOCK_ACCEPTED {
+        @Override
+        public String toString() {
+            return "File successfully locked";
         }
     },
 
@@ -102,7 +109,7 @@ public enum ConsoleOutput {
     FILE_ALREADY_LOCKED {
         @Override
         public String toString() {
-            return "File already locked by user";
+            return "File already locked by user ";
         }
     },
 }

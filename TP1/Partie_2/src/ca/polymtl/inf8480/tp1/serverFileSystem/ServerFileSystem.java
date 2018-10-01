@@ -22,6 +22,7 @@ public class ServerFileSystem implements FileSystemInterface {
     // <document name, document checksum>
     private HashMap<String, String> documentsMap = new HashMap<>();
     // <document name, lock owner name>
+    // TODO: Make lock resilient ?
     private HashMap<String, String> lockedDocuments = new HashMap<>();
     private AuthenticationInterface authServerStub;
 
@@ -85,17 +86,14 @@ public class ServerFileSystem implements FileSystemInterface {
         listFiles();
     }
 
-    private void writeToFile(Credentials credentials) throws IOException {
-//        String path = "./ServerSide/ClientList.txt";
-//        String str = credentials.username + "@" + credentials.password;
-//        BufferedWriter writer = new BufferedWriter(new FileWriter(path, true));
-//
-//        writer.append(str + '\n');
-//        writer.close();
+    private void writeToFile(String path, String str) throws IOException {
+        BufferedWriter writer = new BufferedWriter(new FileWriter(path, false));
+        writer.append(str);
+        writer.close();
     }
 
     private String readFile(String name) throws  IOException {
-        String path = DIRECTORY_NAME + name + ".txt";
+        String path = DIRECTORY_NAME + name;
         File file = new File(path);
         BufferedReader br = new BufferedReader(new FileReader(file));
 
@@ -103,9 +101,12 @@ public class ServerFileSystem implements FileSystemInterface {
 
         String str;
         while ((str = br.readLine()) != null){
-            sc.append(str);
+            sc.append(str + '\n');
         }
-        return sc.toString();
+
+        // remove last '\n'
+        String s = sc.toString();
+        return s.substring(0, s.length() - 1);
     }
 
     private void listFiles() {
@@ -187,7 +188,7 @@ public class ServerFileSystem implements FileSystemInterface {
             return false;
         }
 
-        Path file = Paths.get(DIRECTORY_NAME + name + ".txt");
+        Path file = Paths.get(DIRECTORY_NAME + name);
         List<String> s = Arrays.asList("");
 
         try {
@@ -228,49 +229,92 @@ public class ServerFileSystem implements FileSystemInterface {
     public String get(Credentials credentials, String name, String checksum) throws RemoteException {
         // credentials not good or document doesn't exists
         if(!authServerStub.verifyClient(credentials) || !documentsMap.containsKey(name)){
+            System.out.println("No document of that name here");
             return null;
         }
 
         // if checksum of file on server is the same as client checksum
+        System.out.println("Server checksum : " + documentsMap.get(name));
+        System.out.println("Client checksum : " + checksum);
+
         if(documentsMap.get(name).equals(checksum)){
+            System.out.println("Same checksum");
             return null;
         }
 
         String content = null;
         try {
+            System.out.println("Getting Content");
             content = readFile(name);
         } catch (IOException e){
             System.err.println("Error: " + e.getMessage());
         }
 
+        System.out.println("Content : " + content);
+
         return content;
     }
 
-    // same as a pull, sends the server version of the file
-     public Lock lock(Credentials credentials, Document file) throws RemoteException {
-         if(!authServerStub.verifyClient(credentials) || !documentsMap.containsKey(file.name)){
+     public Lock lock(Credentials credentials, String name) throws RemoteException {
+         if(!authServerStub.verifyClient(credentials) || !documentsMap.containsKey(name)){
              return new Lock(false, ConsoleOutput.FILE_404.toString());
          }
 
-         if(lockedDocuments.containsKey(file.name)){
-             String message = ConsoleOutput.FILE_ALREADY_LOCKED.toString() + lockedDocuments.get(file.name);
+         if(lockedDocuments.containsKey(name)){
+             String message = ConsoleOutput.FILE_ALREADY_LOCKED.toString() + lockedDocuments.get(name);
              return new Lock(false, message);
          }
 
          // send most recent version of the file to the client
          String content = null;
          try {
-             content = readFile(file.name);
+             content = readFile(name);
          } catch (IOException e){
              System.err.println("Error: " + e.getMessage());
          }
 
 
-         lockedDocuments.put(file.name, credentials.username);
+         lockedDocuments.put(name, credentials.username);
          return new Lock(true, content);
      }
 
      public boolean push(Credentials credentials, Document file) throws RemoteException {
+         if(!authServerStub.verifyClient(credentials)){
+             return false;
+         }
+
+         if(!lockedDocuments.containsKey(file.name) || !lockedDocuments.get(file.name).equals(credentials.username)){
+             return false;
+         }
+
+         try {
+             writeToFile(DIRECTORY_NAME + file.name, file.content);
+             documentsMap.put(file.name, file.checksum);
+             lockedDocuments.remove(file.name);
+         } catch (IOException e){
+             System.err.println(e.getMessage());
+         }
+
         return true;
      }
+
+    public ArrayList<Document> syncLocalDirectory(Credentials credentials) throws RemoteException {
+        if(!authServerStub.verifyClient(credentials)){
+            return null;
+        }
+
+        ArrayList<Document> doccumentArray = new ArrayList<>();
+
+        for(String name : documentsMap.keySet()){
+            if(name.charAt(0) != '.'){
+                try {
+                    Document doc = new Document(name, documentsMap.get(name), readFile(name));
+                    doccumentArray.add(doc);
+                } catch (IOException e){
+                    System.err.println(e.getMessage());
+                }
+            }
+        }
+        return doccumentArray;
+    }
 }
