@@ -86,13 +86,10 @@ public class ServerFileSystem implements FileSystemInterface {
         listFiles();
     }
 
-    private void writeToFile(Credentials credentials) throws IOException {
-//        String path = "./ServerSide/ClientList.txt";
-//        String str = credentials.username + "@" + credentials.password;
-//        BufferedWriter writer = new BufferedWriter(new FileWriter(path, true));
-//
-//        writer.append(str + '\n');
-//        writer.close();
+    private void writeToFile(String path, String str) throws IOException {
+        BufferedWriter writer = new BufferedWriter(new FileWriter(path, false));
+        writer.append(str);
+        writer.close();
     }
 
     private String readFile(String name) throws  IOException {
@@ -258,7 +255,6 @@ public class ServerFileSystem implements FileSystemInterface {
         return content;
     }
 
-    // same as a pull, sends the server version of the file
      public Lock lock(Credentials credentials, String name) throws RemoteException {
          if(!authServerStub.verifyClient(credentials) || !documentsMap.containsKey(name)){
              return new Lock(false, ConsoleOutput.FILE_404.toString());
@@ -283,6 +279,22 @@ public class ServerFileSystem implements FileSystemInterface {
      }
 
      public boolean push(Credentials credentials, Document file) throws RemoteException {
+         if(!authServerStub.verifyClient(credentials)){
+             return false;
+         }
+
+         if(!lockedDocuments.containsKey(file.name) || !lockedDocuments.get(file.name).equals(credentials.username)){
+             return false;
+         }
+
+         try {
+             writeToFile(DIRECTORY_NAME + file.name, file.content);
+             documentsMap.put(file.name, file.checksum);
+             lockedDocuments.remove(file.name);
+         } catch (IOException e){
+             System.err.println(e.getMessage());
+         }
+
         return true;
      }
 }

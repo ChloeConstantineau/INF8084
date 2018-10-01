@@ -343,7 +343,7 @@ public class Client {
                 if(lock.isLocked){
                     try {
                         writeToFile(pathClientFiles + "/" + name, lock.message);
-                        System.out.println(ConsoleOutput.LOCK_ACCEPTED);
+                        System.out.println(ConsoleOutput.LOCK_ACCEPTED.toString());
                     } catch (IOException e){
                         System.err.println(e.getMessage());
                     }
@@ -362,9 +362,16 @@ public class Client {
             System.out.println(ConsoleOutput.INVALID_FILE_NAME.toString());
             return;
         }
+
         Credentials credentials = getCurrentUser();
         if(credentials == null){
             System.out.println(ConsoleOutput.INVALID_CREDENTIALS.toString());
+            return;
+        }
+
+        HashSet<String> filesOnServer = getList();
+        if(!filesOnServer.contains(name)){
+            System.out.println(ConsoleOutput.INVALID_FILE_NAME.toString());
             return;
         }
 
