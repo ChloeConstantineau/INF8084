@@ -27,6 +27,7 @@ public class ServerFileSystem implements FileSystemInterface {
     private AuthenticationInterface authServerStub;
 
     private final String DIRECTORY_NAME = "./ServerSide/Files/";
+    private final String LOCKED_FILES = "./ServerSide/LockedFiles.txt";
     private final String SERVERHOST_NAME = "127.0.0.1";
 
 
@@ -84,11 +85,24 @@ public class ServerFileSystem implements FileSystemInterface {
         // when starting server, read from file to see what file I have
         // add to hashset
         listFiles();
+
+        // Add locked document to hashmap
+        try{
+            getLockedFiles();
+        } catch (IOException e){
+            System.err.println("Error: " + e.getMessage());
+        }
     }
 
     private void writeToFile(String path, String str) throws IOException {
         BufferedWriter writer = new BufferedWriter(new FileWriter(path, false));
         writer.append(str);
+        writer.close();
+    }
+
+    private void writeLockDocumentToFile(String name, String owner) throws IOException {
+        BufferedWriter writer = new BufferedWriter(new FileWriter(LOCKED_FILES, true));
+        writer.append(name + "@" + owner + '\n');
         writer.close();
     }
 
@@ -125,6 +139,23 @@ public class ServerFileSystem implements FileSystemInterface {
                 }
             }
         }
+    }
+
+    private void getLockedFiles() throws IOException {
+        File file = new File(LOCKED_FILES);
+        BufferedReader br = new BufferedReader(new FileReader(file));
+
+        String str;
+        while ((str = br.readLine()) != null){
+            addDocumentToMap(str);
+        }
+
+    }
+
+    private void addDocumentToMap(String s){
+        String documentName = s.substring(0, s.indexOf("@"));
+        String lockOwner = s.substring(s.indexOf("@") + 1, s.length());
+        lockedDocuments.put(documentName, lockOwner);
     }
 
     private String md5Checksum(String filePath) throws NoSuchAlgorithmException{
@@ -176,6 +207,24 @@ public class ServerFileSystem implements FileSystemInterface {
 
         //return complete hash
         return sb.toString();
+    }
+
+    private void removeFromLockedFile(String name) throws IOException{
+        File file = new File(LOCKED_FILES);
+        BufferedReader br = new BufferedReader(new FileReader(file));
+
+        String str;
+        StringBuilder sc = new StringBuilder();
+
+        while ((str = br.readLine()) != null){
+            if(!name.equals(str.substring(0, str.indexOf("@")))){
+                sc.append(str);
+            }
+        }
+
+        BufferedWriter writer = new BufferedWriter(new FileWriter(LOCKED_FILES, false));
+        writer.append(sc.toString());
+        writer.close();
     }
 
 
@@ -273,6 +322,12 @@ public class ServerFileSystem implements FileSystemInterface {
              System.err.println("Error: " + e.getMessage());
          }
 
+         // write lock info to file
+         try {
+             writeLockDocumentToFile(name, credentials.username);
+         } catch (IOException e){
+             System.err.println("Error: " + e.getMessage());
+         }
 
          lockedDocuments.put(name, credentials.username);
          return new Lock(true, content);
@@ -291,6 +346,7 @@ public class ServerFileSystem implements FileSystemInterface {
              writeToFile(DIRECTORY_NAME + file.name, file.content);
              documentsMap.put(file.name, file.checksum);
              lockedDocuments.remove(file.name);
+             removeFromLockedFile(file.name);
          } catch (IOException e){
              System.err.println(e.getMessage());
          }
