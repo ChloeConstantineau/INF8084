@@ -79,7 +79,7 @@ public class Client {
 	}
 
 	private void appelNormal() {
-		long start = System.nanoTime();
+	long start = System.nanoTime();
         byte[] byteArray = new byte[(int)Math.pow((double)10, (double)x_size)];
         System.out.println("Payload size is " + byteArray.length);
         localServer.emptyFunc(byteArray, byteArray);
@@ -88,7 +88,7 @@ public class Client {
 	}
 
 	private void appelRMILocal() {		
-	    long start = System.nanoTime();
+	long start = System.nanoTime();
         byte[] byteArray = new byte[(int)Math.pow((double)10, (double)x_size)];
         System.out.println("Payload size is " + byteArray.length);
 
@@ -106,7 +106,7 @@ public class Client {
 	}
 
 	private void appelRMIDistant() {		
-		long start = System.nanoTime();
+	long start = System.nanoTime();
         byte[] byteArray = new byte[(int)Math.pow((double)10, (double)x_size)];
         System.out.println("Payload size is " + byteArray.length);
 
