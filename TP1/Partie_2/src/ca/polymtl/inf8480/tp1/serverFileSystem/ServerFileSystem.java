@@ -22,6 +22,7 @@ public class ServerFileSystem implements FileSystemInterface {
     // <document name, document checksum>
     private HashMap<String, String> documentsMap = new HashMap<>();
     // <document name, lock owner name>
+    // TODO: Make lock resilient ?
     private HashMap<String, String> lockedDocuments = new HashMap<>();
     private AuthenticationInterface authServerStub;
 
@@ -258,26 +259,26 @@ public class ServerFileSystem implements FileSystemInterface {
     }
 
     // same as a pull, sends the server version of the file
-     public Lock lock(Credentials credentials, Document file) throws RemoteException {
-         if(!authServerStub.verifyClient(credentials) || !documentsMap.containsKey(file.name)){
+     public Lock lock(Credentials credentials, String name) throws RemoteException {
+         if(!authServerStub.verifyClient(credentials) || !documentsMap.containsKey(name)){
              return new Lock(false, ConsoleOutput.FILE_404.toString());
          }
 
-         if(lockedDocuments.containsKey(file.name)){
-             String message = ConsoleOutput.FILE_ALREADY_LOCKED.toString() + lockedDocuments.get(file.name);
+         if(lockedDocuments.containsKey(name)){
+             String message = ConsoleOutput.FILE_ALREADY_LOCKED.toString() + lockedDocuments.get(name);
              return new Lock(false, message);
          }
 
          // send most recent version of the file to the client
          String content = null;
          try {
-             content = readFile(file.name);
+             content = readFile(name);
          } catch (IOException e){
              System.err.println("Error: " + e.getMessage());
          }
 
 
-         lockedDocuments.put(file.name, credentials.username);
+         lockedDocuments.put(name, credentials.username);
          return new Lock(true, content);
      }
 

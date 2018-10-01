@@ -1,6 +1,8 @@
 package ca.polymtl.inf8480.tp1.shared;
 
-public class Document {
+import java.io.Serializable;
+
+public class Document implements Serializable {
 
     public String name;
     public String checksum;

@@ -93,6 +93,13 @@ public enum ConsoleOutput {
         }
     },
 
+    LOCK_ACCEPTED {
+        @Override
+        public String toString() {
+            return "File successfully locked";
+        }
+    },
+
     FILE_404 {
         @Override
         public String toString() {

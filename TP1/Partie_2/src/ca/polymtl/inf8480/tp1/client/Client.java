@@ -12,6 +12,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 import java.nio.file.Files;
+import java.util.HashSet;
 import java.util.List;
 
 import ca.polymtl.inf8480.tp1.shared.*;
@@ -190,7 +191,7 @@ public class Client {
         }
     }
 
-    private String getList() {
+    private HashSet<String> getList() {
         Credentials credentials = getCurrentUser();
         if(credentials == null){
             return null;
@@ -198,7 +199,16 @@ public class Client {
 
         try {
             String fileList = fileSystemStub.list(credentials);
-            return fileList;
+            String[] files = fileList.split("\n");
+            HashSet<String> hashSet = new HashSet<>();
+
+            for(String s : files){
+                int lockOwner = s.indexOf(", locked by");
+                s = lockOwner > 0 ? s.substring(0, lockOwner) : s;
+                hashSet.add(s);
+            }
+
+            return hashSet;
         } catch (RemoteException e) {
             System.out.println("Error: " + e.getMessage());
         }
@@ -272,12 +282,23 @@ public class Client {
         }
     }
 
-    // TODO : NOT FINISHED I THINK
+    private void createFileLocally(String name){
+        Path file = Paths.get(pathClientFiles + "/" + name);
+        List<String> s = Arrays.asList("");
+
+        try {
+            Files.write(file, s , Charset.forName("UTF-8"));
+        } catch (IOException e){
+            System.err.println("Error: " + e.getMessage());
+        }
+    }
+
     private void lock(String name) {
         if (name == "") {
             System.out.println(ConsoleOutput.INVALID_FILE_NAME.toString());
             return;
         }
+
         Credentials credentials = getCurrentUser();
         if(credentials == null){
             System.out.println(ConsoleOutput.INVALID_CREDENTIALS.toString());
@@ -285,27 +306,54 @@ public class Client {
         }
 
         //Is file stored server side
-        String filesOnServer = getList();
-        if (!filesOnServer.contains(name)) {
+        HashSet<String> filesOnServer = getList();
+        if(!filesOnServer.contains(name)){
             System.out.println(ConsoleOutput.FILE_404.toString());
+            return;
         }
 
         //Is file stored client side
         File file = new File(pathClientFiles + "/" + name);
         String checksum = null;
         String content = getFileContent(name);
+        Lock lock = null;
+
         if (!file.exists()) {
+            // create file, add content
+            createFileLocally(name);
             try {
-                fileSystemStub.lock(credentials, new Document(name, null, content));
+                lock = (Lock) fileSystemStub.lock(credentials, null);
+                writeToFile(pathClientFiles + "/" + name, lock.message);
             } catch (RemoteException e) {
                 System.out.println("Error: " + e.getMessage());
+            } catch (IOException e){
+                System.err.println(e.getMessage());
             }
+
         } else {
+            // get content and write in file
             try {
                 checksum = md5Checksum(pathClientFiles + "/" + name);
-            } catch (NoSuchAlgorithmException e){
-
+            } catch (NoSuchAlgorithmException e) {
+                System.err.println(e.getMessage());
             }
+
+            try {
+                lock = (Lock) fileSystemStub.lock(credentials, name);
+                if(lock.isLocked){
+                    try {
+                        writeToFile(pathClientFiles + "/" + name, lock.message);
+                        System.out.println(ConsoleOutput.LOCK_ACCEPTED);
+                    } catch (IOException e){
+                        System.err.println(e.getMessage());
+                    }
+                } else {
+                    System.out.println(lock.message);
+                }
+            } catch (RemoteException e){
+                System.err.println(e.getMessage());
+            }
+
         }
     }
 
