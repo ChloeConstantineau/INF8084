@@ -1,8 +1,8 @@
 # INF8480
 Distributed systems - Cloud
 
-#TP1 -
-##Partie 1 -
+# TP1 -
+## Partie 1 -
 
 Étapes:
 
@@ -17,7 +17,7 @@ Distributed systems - Cloud
 	x est la taille des arguments passés en paramètre lors de l'appel de fonction emptyFunc(). La taille est de l'ordre de 10^x.
 	
 
-##Partie 2 - 
+## Partie 2 - 
 
 Étapes:
 
