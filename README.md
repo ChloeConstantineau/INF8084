@@ -5,6 +5,7 @@ Distributed systems - Cloud
 ##Partie 1 -
 
 Étapes:
+
 0. Aller dans dossier TP1\Partie_1\ResponseTime_Analyzer
 1. Compiler le projet avec la commande : ant
 2. cd dans le dossier : bin
@@ -17,6 +18,9 @@ Distributed systems - Cloud
 	
 
 ##Partie 2 - 
+
+Étapes:
+
 0. Aller dans dossier TP1\Partie_2
 1. Compiler le projet avec la commande : ant
 2. cd dans le dossier : bin
