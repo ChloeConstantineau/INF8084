@@ -10,11 +10,11 @@ Distributed systems - Cloud
 1. Compiler le projet avec la commande : ant
 2. cd dans le dossier : bin
 3. Lancer la commande : rmiregistry &
-4. Excuter le serveur : ./server.sh
-	Si le serveur est exécuter sur une machine distante, garder en note son adresse ip
-5. Lancer le client sur la machine locale : ./client ipaddress x
-	ipaddress - 127.0.0.1 pour une machine locale, sinon adresse ip du serveur distante
+4. Excuter le serveur : cd.. puis ./server.sh
+	IL faut exécuter les étapes 0 à 4 pour le serveur distant et le serveur local.
+5. Lancer le client sur la machine locale : ./client ipDistantServer x	
 	x est la taille des arguments passés en paramètre lors de l'appel de fonction emptyFunc(). La taille est de l'ordre de 10^x.
+    le client saura se connecté au serveur local (127.0.0.1), il ne requiert donc que l'adresse ip du serveur distant.
 	
 
 ## Partie 2 - 
@@ -40,3 +40,6 @@ Distributed systems - Cloud
 	
 Les fichiers existants côté client sont dans le répertoire Partie_2\ClientSide\Files. Il exite aussi dans le répertoire Partie_2\ClientSide, la liste des utilisaterus qui ont réussi à se connecter au serveur (ClientList.txt) et le fichier CurrentUser.txt qui contient le nom de l'utilisateur courant.
 Les fichiers existants côté serveur sont dans le répertoire Partie_2\ServerSide\Files. Il existe aussi dans le répertoire Partie_2\ServerSide\Files, la liste des utilisateurs qui ont réussi à se connecter au server dans le fichier ClientList.txt.
+
+### Troubleshoot
+Si le terminal indique que vous n'avez pas les persmissions pour ce projet, exécuter la commande : chmod 777 ./myProject.sh
