@@ -11,11 +11,13 @@ import ca.polymtl.inf8480.tp1.shared.ServerInterface;
 
 public class Client {
 	
+	public static int x_size = 1;
+	
 	public static void main(String[] args) {
 		String distantHostname = null;
+		x_size = 1; //Default value
  		if (args.length == 1) {
 			distantHostname = args[0];
-			x_size = 1; //Default value of factor x.
 		}
 		else if(args.length > 1){
 			distantHostname = args[0];
@@ -32,6 +34,7 @@ public class Client {
 	FakeServer localServer = null;
 	private ServerInterface localServerStub = null;
 	private ServerInterface distantServerStub = null;
+
 
 	public Client(String distantServerHostname) {
 		super();
