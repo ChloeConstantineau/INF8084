@@ -98,7 +98,10 @@ public class Client {
                 list();
                 break;
             case "syncLocalDirectory":
-                syncLocalDirectory();
+                syncLocal(true);
+                break;
+            case "syncLocalFiles":
+                syncLocal(false);
                 break;
             case "get":
                 get(param[0]);
@@ -215,7 +218,7 @@ public class Client {
         return null;
     }
 
-    private void syncLocalDirectory() {
+    private void syncLocal(boolean allFiles) {
         Credentials credentials = getCurrentUser();
         if(credentials == null){
             System.out.println(ConsoleOutput.INVALID_CREDENTIALS.toString());
@@ -238,8 +241,17 @@ public class Client {
                 } catch (IOException e){
                     System.err.println(e.getMessage());
                 }
+            } else if(allFiles) {
+                // create file in directory + write in it
+                create(doc.name);
+                try{
+                    writeToFile(pathClientFiles + doc.name, doc.content);
+                } catch (IOException e) {
+                    System.err.println("Error: " + e.getMessage());
+                }
             }
         }
+        System.out.println(ConsoleOutput.SYNC_SUCCESS.toString());
     }
 
     private void writeToFile(String path, String str) throws IOException {

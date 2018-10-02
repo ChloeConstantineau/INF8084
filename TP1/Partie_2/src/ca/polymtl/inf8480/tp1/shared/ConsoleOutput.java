@@ -40,7 +40,7 @@ public enum ConsoleOutput {
     REGISTRATION_APPROVED {
         @Override
         public String toString() {
-            return "he client was successfully registered.";
+            return "The client was successfully registered.";
         }
     },
 
@@ -106,10 +106,18 @@ public enum ConsoleOutput {
             return "File not found on server.";
         }
     },
+
     FILE_ALREADY_LOCKED {
         @Override
         public String toString() {
             return "File already locked by user ";
+        }
+    },
+
+    SYNC_SUCCESS {
+        @Override
+        public String toString() {
+            return "File synchronization successful";
         }
     },
 }
