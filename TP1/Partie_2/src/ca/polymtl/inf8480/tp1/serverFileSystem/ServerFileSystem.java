@@ -22,7 +22,6 @@ public class ServerFileSystem implements FileSystemInterface {
     // <document name, document checksum>
     private HashMap<String, String> documentsMap = new HashMap<>();
     // <document name, lock owner name>
-    // TODO: Make lock resilient ?
     private HashMap<String, String> lockedDocuments = new HashMap<>();
     private AuthenticationInterface authServerStub;
 
@@ -277,29 +276,26 @@ public class ServerFileSystem implements FileSystemInterface {
 
     public String get(Credentials credentials, String name, String checksum) throws RemoteException {
         // credentials not good or document doesn't exists
+        System.out.println("Getting file " + name);
         if(!authServerStub.verifyClient(credentials) || !documentsMap.containsKey(name)){
-            System.out.println("No document of that name here");
+            System.out.println("Something went wrong");
             return null;
         }
 
         // if checksum of file on server is the same as client checksum
-        System.out.println("Server checksum : " + documentsMap.get(name));
-        System.out.println("Client checksum : " + checksum);
-
         if(documentsMap.get(name).equals(checksum)){
             System.out.println("Same checksum");
             return null;
         }
 
+        System.out.println("Getting content");
         String content = null;
         try {
-            System.out.println("Getting Content");
             content = readFile(name);
+            System.out.println(content);
         } catch (IOException e){
             System.err.println("Error: " + e.getMessage());
         }
-
-        System.out.println("Content : " + content);
 
         return content;
     }
@@ -360,7 +356,6 @@ public class ServerFileSystem implements FileSystemInterface {
         }
 
         ArrayList<Document> doccumentArray = new ArrayList<>();
-
         for(String name : documentsMap.keySet()){
             if(name.charAt(0) != '.'){
                 try {
@@ -371,6 +366,7 @@ public class ServerFileSystem implements FileSystemInterface {
                 }
             }
         }
+
         return doccumentArray;
     }
 }
