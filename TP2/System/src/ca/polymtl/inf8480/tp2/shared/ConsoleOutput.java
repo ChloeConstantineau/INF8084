@@ -5,7 +5,7 @@ public enum ConsoleOutput {
     NOT_ENOUGH_ARGS {
         @Override
         public String toString() {
-            return "Missing an argument. Please provide an argument m between 0 and 1";
+            return "Missing an argument. Please provide m value and capacity";
         }
     },
     WRONG_ARGS {
@@ -17,7 +17,14 @@ public enum ConsoleOutput {
     NAN {
         @Override
         public String toString() {
-            return "Argument needs to be a number between 0 and 1";
+            return "Arguments need to be numbers";
         }
     },
+    POSITIVE_NUMBER_ONLY {
+        @Override
+        public String toString() {
+            return "Please provide a positive capacity number";
+        }
+    },
+
 }
