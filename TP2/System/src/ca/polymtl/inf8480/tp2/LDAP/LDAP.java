@@ -3,7 +3,6 @@ package ca.polymtl.inf8480.tp2.LDAP;
 import ca.polymtl.inf8480.tp2.shared.*;
 import ca.polymtl.inf8480.tp2.shared.exception.*;
 
-import java.net.InetAddress;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -13,7 +12,7 @@ import java.rmi.registry.Registry;
 
 public class LDAP implements ILDAP {
 
-    ConcurrentLinkedQueue<String> operationServerRegistry = new ConcurrentLinkedQueue<String>();
+    ConcurrentLinkedQueue<String> operationServerRegistry = new ConcurrentLinkedQueue<>();
 
     public LDAP() {
     }
@@ -26,12 +25,8 @@ public class LDAP implements ILDAP {
     @Override
     public ConcurrentLinkedQueue<String> getAvailableOperationServer() {
         for (String i: operationServerRegistry) {
-            try{
-                ping(i);
-
-            }catch(Exception e){
+            if(!ping(i))
                 operationServerRegistry.remove(i);
-            }
         }
         return operationServerRegistry;
     }
@@ -39,6 +34,8 @@ public class LDAP implements ILDAP {
     @Override
     public void registerOperationServer(String hostname) throws RemoteException {
         try {
+            if(operationServerRegistry.contains(hostname))
+                throw new ServerRegistrationException();
             operationServerRegistry.add(hostname);
         } catch (NullPointerException e) {
             System.out.println(e.getMessage());

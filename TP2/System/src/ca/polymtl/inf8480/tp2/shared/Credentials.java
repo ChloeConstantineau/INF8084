@@ -4,8 +4,8 @@ import java.io.Serializable;
 
 public class Credentials implements Serializable {
 
-    String username;
-    String password;
+    public String username;
+    public String password;
 
     public static Credentials of(String username, String password){  // Credentials c = Crendentials.of(“name”,"psw");
         return new Credentials(username, password);

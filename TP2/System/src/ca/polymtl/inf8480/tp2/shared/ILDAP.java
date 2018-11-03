@@ -9,5 +9,5 @@ public interface ILDAP {
 
     boolean authenticateDispatcher(Credentials credentials) throws RemoteException;
     ConcurrentLinkedQueue<String> getAvailableOperationServer() throws RemoteException;
-    void registerOperationServer(String name) throws RemoteException;
+    void registerOperationServer(String hostname) throws RemoteException;
 }

@@ -9,6 +9,7 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.Random;
+import java.rmi.RemoteException;
 
 public class OperationServer implements IOperationServer {
 
@@ -102,7 +103,7 @@ public class OperationServer implements IOperationServer {
     }
 
     @Override
-    public String ping() {
+    public String ping() throws RemoteException {
         return "Pong!";
     }
 
