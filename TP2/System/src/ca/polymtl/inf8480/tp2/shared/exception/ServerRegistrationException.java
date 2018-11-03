@@ -4,6 +4,6 @@ import java.rmi.RemoteException;
 
 public class ServerRegistrationException extends RemoteException {
     public ServerRegistrationException() {
-        super("Operation server was not able to register with LDAP server");
+        super("Server was not able to register with LDAP server");
     }
 }

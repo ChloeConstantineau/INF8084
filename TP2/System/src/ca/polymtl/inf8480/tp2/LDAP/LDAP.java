@@ -5,6 +5,7 @@ import ca.polymtl.inf8480.tp2.shared.exception.*;
 
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
@@ -13,22 +14,28 @@ import java.rmi.registry.Registry;
 public class LDAP implements ILDAP {
 
     ConcurrentLinkedQueue<String> operationServerRegistry = new ConcurrentLinkedQueue<>();
+    ConcurrentHashMap<String, Credentials> dispatcherRegistry = new ConcurrentHashMap<>();
 
     public LDAP() {
     }
 
     @Override
-    public boolean authenticateDispatcher(Credentials credentials) throws RemoteException {
-        return true;
+    public boolean authenticateDispatcher(Credentials credentials) {
+        if(!dispatcherRegistry.containsKey(credentials.username)){
+            return false;
+        }
+        return dispatcherRegistry.get(credentials.username).password == credentials.password;
     }
 
-    @Override
-    public ConcurrentLinkedQueue<String> getAvailableOperationServer() {
-        for (String i: operationServerRegistry) {
-            if(!ping(i))
-                operationServerRegistry.remove(i);
+    public void registerDispatcher(Credentials credentials) throws RemoteException {
+        try {
+            if(dispatcherRegistry.contains(credentials.username))
+                throw new ServerRegistrationException();
+            dispatcherRegistry.put(credentials.username, credentials);
+        } catch (NullPointerException e) {
+            System.out.println(e.getMessage());
+            throw new ServerRegistrationException();
         }
-        return operationServerRegistry;
     }
 
     @Override
@@ -41,6 +48,15 @@ public class LDAP implements ILDAP {
             System.out.println(e.getMessage());
             throw new ServerRegistrationException();
         }
+    }
+
+    @Override
+    public ConcurrentLinkedQueue<String> getAvailableOperationServer() {
+        for (String i: operationServerRegistry) {
+            if(!ping(i))
+                operationServerRegistry.remove(i);
+        }
+        return operationServerRegistry;
     }
 
     public boolean ping(String hostname){
