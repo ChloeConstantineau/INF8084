@@ -5,6 +5,7 @@ import ca.polymtl.inf8480.tp2.shared.exception.*;
 
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
+import java.util.ArrayList;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
@@ -24,10 +25,17 @@ public class LDAP implements ILDAP {
 
     @Override
     public ConcurrentLinkedQueue<String> getAvailableOperationServer() {
+        ArrayList<String> deadServer = new ArrayList<>();
+
         for (String i: operationServerRegistry) {
             if(!ping(i))
-                operationServerRegistry.remove(i);
+                deadServer.add(i);
         }
+
+        for(String s : deadServer){
+            operationServerRegistry.remove(s);
+        }
+
         return operationServerRegistry;
     }
 
