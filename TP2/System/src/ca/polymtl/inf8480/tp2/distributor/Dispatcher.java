@@ -1,12 +1,16 @@
 package ca.polymtl.inf8480.tp2.distributor;
 
-public class Distributor{
+public class Dispatcher {
 
-    WorkerLoader workerLoader = new wo
+    WorkerLoader workerLoader = new WorkerLoader();
 
-    int countCheck = 0;
-    int secureMode = 1;
+    static int countCheck = 0;
+    static int secureMode = 1;
     int unsecureMode = 2;
+
+    public Dispatcher(String s){
+
+    }
 
     public static void main(String[] args) throws Exception{
 
@@ -26,19 +30,19 @@ public class Distributor{
             System.out.println("Unsercure mode activated, number of checks: " + countCheck);
         }
 
-        Distributor distributor = new Distributor(operationsPath);
+        Dispatcher dispatcher = new Dispatcher(operationsPath);
 
         long start = System.nanoTime();
-        distributor.dispatch();
+        dispatcher.dispatch("this");
         long elapsedTime = System.nanoTime() - start;
         System.out.println("Elapsed time: " + elapsedTime/1000000 + " ms");
     }
 
-    public void loadWorkers(string operationsPath){
+    public void loadWorkers(String operationsPath){
 
     }
 
-    public void dispatch(string operationsPath){
+    public void dispatch(String operationsPath){
 
     }
 }

@@ -1,8 +1,13 @@
 package ca.polymtl.inf8480.tp2.distributor;
 
-import ca.polymtl.inf8480.tp2.shared.;
+import ca.polymtl.inf8480.tp2.shared.IWorker;
 
-public class workerLoader {
+import java.rmi.NotBoundException;
+import java.rmi.RemoteException;
+import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
+
+public class WorkerLoader {
 
     public static IWorker loadDistributor(String hostname) throws Exception {
         if (System.getSecurityManager() == null) {
@@ -12,15 +17,13 @@ public class workerLoader {
         IWorker stub = null;
 
         try {
-            Registry registry = (hostname == "") ? LocateRegistry.getRegistry() : LocateRegistry.getRegistry(hostname, 5000);
+            Registry registry = hostname == "" ? LocateRegistry.getRegistry() : LocateRegistry.getRegistry(hostname, 5000);
             stub = (IWorker) registry.lookup("distributor");
-        } catch (NotBoundException e) {
+        } catch (RemoteException e) {
             System.out.println("Error: the given name '" + e.getMessage()
                     + "' is not defined in the registry");
-        } catch (AccessException e) {
+        } catch (NotBoundException e) {
             System.out.println("Error: " + e.getMessage());
-        } catch (RemoteException e) {
-            System.out.println("Erroe: " + e.getMessage());
         }
 
         return stub;

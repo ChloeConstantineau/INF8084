@@ -16,6 +16,7 @@
 		<delete dir="bin" />
 		<delete file="operationServer.jar" />
 		<delete file="shared.jar" />
+		<delete file="dispatcher.jar" />
 	</target>
 	<target depends="init" name="build-class">
 		<javac debug="true" debuglevel="${debuglevel}" destdir="bin" includeantruntime="false">
@@ -26,5 +27,6 @@
 	<target depends="build-class" name="build-jar">
 		<jar destfile="shared.jar" basedir="bin" includes="ca/polymtl/inf8480/tp2/shared/**" update="false" />
 		<jar destfile="operationServer.jar" basedir="bin" includes="ca/polymtl/inf8480/tp2/server/**" update="false" />
+		<jar destfile="dispatcher.jar" basedir="bin" includes="ca/polymtl/inf8480/tp2/dispatcher/**" update="false" />
 	</target>
 </project>
