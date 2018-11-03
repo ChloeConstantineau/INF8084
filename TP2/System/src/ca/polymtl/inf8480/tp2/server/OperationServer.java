@@ -1,9 +1,6 @@
 package ca.polymtl.inf8480.tp2.server;
 
-import ca.polymtl.inf8480.tp2.shared.ConsoleOutput;
-import ca.polymtl.inf8480.tp2.shared.Credentials;
-import ca.polymtl.inf8480.tp2.shared.IOperationServer;
-import ca.polymtl.inf8480.tp2.shared.OverloadingServerException;
+import ca.polymtl.inf8480.tp2.shared.*;
 
 import java.io.IOException;
 import java.rmi.ConnectException;
@@ -16,7 +13,7 @@ import java.util.Random;
 public class OperationServer implements IOperationServer {
 
     private int load;
-    private Float wrongResultRate;
+    private float wrongResultRate;
     private int capacity;
 
 
@@ -36,7 +33,7 @@ public class OperationServer implements IOperationServer {
         server.run();
     }
 
-    public OperationServer(Float m, int c) throws IOException {
+    public OperationServer(float m, int c) throws IOException {
         super();
         wrongResultRate = m;
         capacity = c;
@@ -55,7 +52,7 @@ public class OperationServer implements IOperationServer {
         }
 
         // Check if could be a number
-        Float m;
+        float m;
         int c;
         try {
             m = Float.parseFloat(args[0]);
@@ -98,6 +95,8 @@ public class OperationServer implements IOperationServer {
         } catch (Exception e) {
             System.err.println("Erreur: " + e.getMessage());
         }
+
+        isTrustworthy();
     }
 
     @Override
@@ -105,39 +104,56 @@ public class OperationServer implements IOperationServer {
         this.load = load;
     }
 
-    private boolean acceptTask(int taskOperations) {
-        /* Ainsi, chaque calculateur acceptera toutes les tâches contenant
-         * au plus Ci opérations mathématiques
-         */
+    private boolean accept(int taskOperations) {
+        /* Every opServer will accept a taskNb <= capacity */
         if(taskOperations <= capacity){
             return true;
         }
 
-        /* On simulera le taux de refus des tâches à l'aide d'une
-        * fonction mathématique simple
-        */
-        double treshold = (taskOperations - capacity)/(4 * capacity);
-        Random r = new Random();
-        double localValue = r.nextDouble();
+        /* Reject rate simulation */
+        float rejectionThreshold = ((float)taskOperations - (float)capacity)/(4 * (float)capacity);
+        float localValue = new Random().nextFloat();
 
-        return localValue > treshold;
+        return localValue > rejectionThreshold;
     }
 
     private boolean isTrustworthy(){
-        return true;
+        float localValue = new Random().nextFloat();
+        return localValue > wrongResultRate;
     }
 
-    // public Collection<Operation> execute(){
-    // will be passing a collection of tasks probably
-    public void execute(Credentials credentials, int numberOfTask) throws RemoteException{
+    public TaskResponse execute(Credentials credentials, Task task) throws OverloadingServerException {
         // check if user is valid
+        // ask LDAP.authentify(Credentials)
 
         // check if server accepts task
-        if(!acceptTask(numberOfTask)){
+        if(!accept(task.operations.size())){
             throw new OverloadingServerException();
         }
 
+        // Check if server is evil
+        return isTrustworthy() ? trustedResponse(task) : untrustedResponse();
+    }
+
+    private TaskResponse trustedResponse(Task task){
+        int result = getResult(task);
+        return TaskResponse.of(result, ConsoleOutput.RIGHT_RESULT.toString());
+    }
+
+    private int getResult(Task task) {
+        int result = 0;
 
 
+        // ( ( ( 29 % 4000 + 5 ) % 4000 + 13860 ) % 4000 + 13 ) % 4000 = 1907
+        for(Operation op : task.operations){
+
+        }
+
+        return result;
+    }
+
+    private TaskResponse untrustedResponse() {
+        int fakeValue = new Random().nextInt();
+        return TaskResponse.of(fakeValue, ConsoleOutput.WRONG_RESULT.toString());
     }
 }

@@ -1,6 +1,8 @@
 package ca.polymtl.inf8480.tp2.shared;
 
-public class Credentials {
+import java.io.Serializable;
+
+public class Credentials implements Serializable {
 
     String username;
     String password;
