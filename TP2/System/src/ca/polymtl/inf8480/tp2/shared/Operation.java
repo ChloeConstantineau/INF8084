@@ -2,16 +2,16 @@ package ca.polymtl.inf8480.tp2.shared;
 
 import java.io.Serializable;
 
+/**
+ * Methodes utilitaires pour effectuer les operations du TP2.
+ *
+ * L'implementation des operations est volontairement non-optimale.
+ *
+ * @author Simon Delisle et Francois Doray
+ *
+ */
 public class Operation implements Serializable {
 
-    /**
-     * Methodes utilitaires pour effectuer les operations du TP2.
-     *
-     * L'implementation des operations est volontairement non-optimale.
-     *
-     * @author Simon Delisle et Francois Doray
-     *
-     */
     public static int pell(int x) {
         if (x == 0)
             return 0;

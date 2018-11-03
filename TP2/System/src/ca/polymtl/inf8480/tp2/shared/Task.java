@@ -5,13 +5,9 @@ import java.util.List;
 
 public class Task{
 
-    ArrayList<Operation> Operations;
-
-    public Task(){
-        Operations = new ArrayList<Operation>();
-    }
+    public List<Operation> operations;
 
     public Task(ArrayList<Operation> operations){
-        Operations = operations;
+        this.operations = operations;
     }
 }
