@@ -1,8 +1,8 @@
-package ca.polymtl.inf8480.tp2.distributor;
+package ca.polymtl.inf8480.tp2.dispatcher;
 
 public class Dispatcher {
 
-    WorkerLoader workerLoader = new WorkerLoader();
+    OperationServerLoader operationServerLoader = new OperationServerLoader();
 
     static int countCheck = 0;
     static int secureMode = 1;

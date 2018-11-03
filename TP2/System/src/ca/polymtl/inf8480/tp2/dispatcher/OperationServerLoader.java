@@ -1,4 +1,4 @@
-package ca.polymtl.inf8480.tp2.distributor;
+package ca.polymtl.inf8480.tp2.dispatcher;
 
 import ca.polymtl.inf8480.tp2.shared.IWorker;
 
@@ -7,7 +7,7 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 
-public class WorkerLoader {
+public class OperationServerLoader {
 
     public static IWorker loadDistributor(String hostname) throws Exception {
         if (System.getSecurityManager() == null) {
