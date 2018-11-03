@@ -1,10 +1,10 @@
 package ca.polymtl.inf8480.tp2.server;
 
 import ca.polymtl.inf8480.tp2.shared.*;
+import ca.polymtl.inf8480.tp2.shared.exception.*;
 
 import java.io.IOException;
 import java.rmi.ConnectException;
-import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
@@ -12,13 +12,15 @@ import java.util.Random;
 
 public class OperationServer implements IOperationServer {
 
-    private int load;
     private float wrongResultRate;
     private int capacity;
 
+    public OperationServer() {
+        super();
+    }
 
-    public static void main(String[] args){
-        if(!isValid(args)){
+    public static void main(String[] args) {
+        if (!isValid(args)) {
             return;
         }
 
@@ -40,13 +42,13 @@ public class OperationServer implements IOperationServer {
 
     }
 
-    private static void print(String s){
+    private static void print(String s) {
         System.out.println(s);
     }
 
-    public static boolean isValid(String[] args){
+    public static boolean isValid(String[] args) {
         // Check that evilness level has been given
-        if(args.length != 2){
+        if (args.length != 2) {
             print(ConsoleOutput.NOT_ENOUGH_ARGS.toString());
             return false;
         }
@@ -57,17 +59,17 @@ public class OperationServer implements IOperationServer {
         try {
             m = Float.parseFloat(args[0]);
             c = Integer.parseInt(args[1]);
-        } catch(NumberFormatException e) {
+        } catch (NumberFormatException e) {
             print(ConsoleOutput.NAN.toString());
             return false;
         }
 
         // Check evilness value is between 0 and 1
-        if(m > 1 || m < 0) {
+        if (m > 1 || m < 0) {
             print(ConsoleOutput.WRONG_ARGS.toString());
             return false;
         }
-        if(c < 0){
+        if (c < 0) {
             print(ConsoleOutput.POSITIVE_NUMBER_ONLY.toString());
             return false;
         }
@@ -75,7 +77,7 @@ public class OperationServer implements IOperationServer {
         return true;
     }
 
-    public void run(){
+    public void run() {
         if (System.getSecurityManager() == null) {
             System.setSecurityManager(new SecurityManager());
         }
@@ -99,20 +101,25 @@ public class OperationServer implements IOperationServer {
         isTrustworthy();
     }
 
+    @Override
+    public String ping() {
+        return "Pong!";
+    }
+
     private boolean accept(int taskOperations) {
         /* Every opServer will accept a taskNb <= capacity */
-        if(taskOperations <= capacity){
+        if (taskOperations <= capacity) {
             return true;
         }
 
         /* Reject rate simulation */
-        float rejectionThreshold = ((float)taskOperations - (float)capacity)/(4 * (float)capacity);
+        float rejectionThreshold = ((float) taskOperations - (float) capacity) / (4 * (float) capacity);
         float localValue = new Random().nextFloat();
 
         return localValue > rejectionThreshold;
     }
 
-    private boolean isTrustworthy(){
+    private boolean isTrustworthy() {
         float localValue = new Random().nextFloat();
         return localValue > wrongResultRate;
     }
@@ -122,7 +129,7 @@ public class OperationServer implements IOperationServer {
         // ask LDAP.authentify(Credentials)
 
         // check if server accepts task
-        if(!accept(task.operations.size())){
+        if (!accept(task.operations.size())) {
             throw new OverloadingServerException();
         }
 
@@ -130,7 +137,7 @@ public class OperationServer implements IOperationServer {
         return isTrustworthy() ? trustedResponse(task) : untrustedResponse();
     }
 
-    private TaskResponse trustedResponse(Task task){
+    private TaskResponse trustedResponse(Task task) {
         int result = getResult(task);
         return TaskResponse.of(result, ConsoleOutput.RIGHT_RESULT.toString());
     }
@@ -138,8 +145,8 @@ public class OperationServer implements IOperationServer {
     private int getResult(Task task) {
         int result = 0;
 
-        for(Operation op : task.operations){
-            switch (op.type){
+        for (Operation op : task.operations) {
+            switch (op.type) {
                 case Pell:
                     result += Utils.pell(op.value);
                     break;
