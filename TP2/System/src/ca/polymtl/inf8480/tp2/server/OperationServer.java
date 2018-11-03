@@ -49,8 +49,16 @@ public class OperationServer implements IOperationServer {
             return false;
         }
 
+        // Check if could be a number
+        Float m;
+        try {
+            m = Float.parseFloat(args[0]);
+        } catch(NumberFormatException e) {
+            print(ConsoleOutput.NAN.toString());
+            return false;
+        }
+
         // Check evilness value is between 0 and 1
-        Float m = Float.parseFloat(args[0]);
         if(m > 1 || m < 0) {
             print(ConsoleOutput.WRONG_ARGS.toString());
             return false;

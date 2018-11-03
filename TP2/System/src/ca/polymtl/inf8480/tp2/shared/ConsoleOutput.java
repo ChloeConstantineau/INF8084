@@ -14,4 +14,10 @@ public enum ConsoleOutput {
             return "Value of argument m must be between 0 and 1";
         }
     },
+    NAN {
+        @Override
+        public String toString() {
+            return "Argument needs to be a number between 0 and 1";
+        }
+    },
 }
