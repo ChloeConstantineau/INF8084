@@ -4,7 +4,7 @@ import java.rmi.RemoteException;
 
 public class OverloadingServerException extends RemoteException {
     public OverloadingServerException() {
-        super("Operation cannot be executed by server at the moment.");
+        super("Utils cannot be executed by server at the moment.");
     }
 }
 
