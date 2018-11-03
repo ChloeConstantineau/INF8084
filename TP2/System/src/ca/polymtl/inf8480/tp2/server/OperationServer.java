@@ -99,11 +99,6 @@ public class OperationServer implements IOperationServer {
         isTrustworthy();
     }
 
-    @Override
-    public void reset(int load) throws RemoteException {
-        this.load = load;
-    }
-
     private boolean accept(int taskOperations) {
         /* Every opServer will accept a taskNb <= capacity */
         if(taskOperations <= capacity){
@@ -143,17 +138,22 @@ public class OperationServer implements IOperationServer {
     private int getResult(Task task) {
         int result = 0;
 
-
-        // ( ( ( 29 % 4000 + 5 ) % 4000 + 13860 ) % 4000 + 13 ) % 4000 = 1907
         for(Operation op : task.operations){
-
+            switch (op.type){
+                case Pell:
+                    result += Utils.pell(op.value);
+                    break;
+                case Prime:
+                    result += Utils.prime(op.value);
+                    break;
+            }
+            result = result % 4000;
         }
-
         return result;
     }
 
     private TaskResponse untrustedResponse() {
-        int fakeValue = new Random().nextInt();
+        int fakeValue = new Random().nextInt(Integer.MAX_VALUE);
         return TaskResponse.of(fakeValue, ConsoleOutput.WRONG_RESULT.toString());
     }
 }
