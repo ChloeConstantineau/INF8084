@@ -3,7 +3,7 @@ package ca.polymtl.inf8480.tp2.server;
 import ca.polymtl.inf8480.tp2.shared.ConsoleOutput;
 import ca.polymtl.inf8480.tp2.shared.Credentials;
 import ca.polymtl.inf8480.tp2.shared.IOperationServer;
-import ca.polymtl.inf8480.tp2.shared.OverloadingServerException;
+import ca.polymtl.inf8480.tp2.shared.exception.OverloadingServerException;
 
 import java.io.IOException;
 import java.rmi.ConnectException;
@@ -116,11 +116,11 @@ public class OperationServer implements IOperationServer {
         /* On simulera le taux de refus des tâches à l'aide d'une
         * fonction mathématique simple
         */
-        double treshold = (taskOperations - capacity)/(4 * capacity);
+        double threshold = (taskOperations - capacity)/(4 * capacity);
         Random r = new Random();
         double localValue = r.nextDouble();
 
-        return localValue > treshold;
+        return localValue > threshold;
     }
 
     private boolean isTrustworthy(){

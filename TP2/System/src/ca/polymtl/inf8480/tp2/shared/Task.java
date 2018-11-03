@@ -5,13 +5,13 @@ import java.util.List;
 
 public class Task{
 
-    List<Operation> Operations;
+    ArrayList<Operation> Operations;
 
     public Task(){
         Operations = new ArrayList<Operation>();
     }
 
-    public Task(List<Operation> operations){
+    public Task(ArrayList<Operation> operations){
         Operations = operations;
     }
 }
