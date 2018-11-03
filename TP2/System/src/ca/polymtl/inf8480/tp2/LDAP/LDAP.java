@@ -6,13 +6,14 @@ import ca.polymtl.inf8480.tp2.shared.exception.*;
 import java.net.InetAddress;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 
+
 public class LDAP implements ILDAP {
 
-    ConcurrentHashMap<String, InetAddress> operationServerRegistry = new ConcurrentHashMap<String, InetAddress>();
+    ConcurrentLinkedQueue<String> operationServerRegistry = new ConcurrentLinkedQueue<String>();
 
     public LDAP() {
     }
@@ -23,29 +24,43 @@ public class LDAP implements ILDAP {
     }
 
     @Override
-    public ConcurrentHashMap<String, InetAddress> getAvailableOperationServer() throws RemoteException {
+    public ConcurrentLinkedQueue<String> getAvailableOperationServer() {
+        for (String i: operationServerRegistry) {
+            try{
+                ping(i);
+
+            }catch(Exception e){
+                operationServerRegistry.remove(i);
+            }
+        }
         return operationServerRegistry;
     }
 
     @Override
-    public void registerOperationServer(String name, InetAddress address) throws RemoteException {
+    public void registerOperationServer(String hostname) throws RemoteException {
         try {
-            operationServerRegistry.put(name, address);
+            operationServerRegistry.add(hostname);
         } catch (NullPointerException e) {
             System.out.println(e.getMessage());
             throw new ServerRegistrationException();
         }
     }
 
-    public boolean ping(ServerDetails serverDetails) {
+    public boolean ping(String hostname){
+        if (hostname == null) {
+            throw new IllegalArgumentException();
+        }
+
         try {
-            Registry registry = LocateRegistry.getRegistry(serverDetails.host, Constants.RMI_REGISTRY_PORT);
-            IOperationServer stub = ((IOperationServer) registry.lookup(serverDetails.host));
+            Registry registry = LocateRegistry.getRegistry(hostname, Constants.RMI_REGISTRY_PORT);
+            IOperationServer stub = ((IOperationServer) registry.lookup(hostname));
+            stub.ping();
 
         } catch (NotBoundException e) {
+            System.out.println(e.getMessage());
 
         } catch (RemoteException e) {
-
+            return false;
         }
         return true;
     }
