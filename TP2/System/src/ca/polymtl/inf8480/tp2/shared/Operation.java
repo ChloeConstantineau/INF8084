@@ -4,11 +4,6 @@ import java.io.Serializable;
 
 public class Operation implements Serializable {
 
-
-
-
-
-
     /**
      * Methodes utilitaires pour effectuer les operations du TP2.
      *

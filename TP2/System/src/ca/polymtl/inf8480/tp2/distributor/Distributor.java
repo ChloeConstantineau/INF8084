@@ -2,6 +2,8 @@ package ca.polymtl.inf8480.tp2.distributor;
 
 public class Distributor{
 
+    WorkerLoader workerLoader = new wo
+
     int countCheck = 0;
     int secureMode = 1;
     int unsecureMode = 2;
@@ -30,6 +32,10 @@ public class Distributor{
         distributor.dispatch();
         long elapsedTime = System.nanoTime() - start;
         System.out.println("Elapsed time: " + elapsedTime/1000000 + " ms");
+    }
+
+    public void loadWorkers(string operationsPath){
+
     }
 
     public void dispatch(string operationsPath){
