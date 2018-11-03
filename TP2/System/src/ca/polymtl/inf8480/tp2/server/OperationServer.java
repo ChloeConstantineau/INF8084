@@ -16,10 +16,6 @@ public class OperationServer implements IOperationServer {
     private float wrongResultRate;
     private int capacity;
 
-    public OperationServer() {
-        super();
-    }
-
     public static void main(String[] args) {
         if (!isValid(args)) {
             return;

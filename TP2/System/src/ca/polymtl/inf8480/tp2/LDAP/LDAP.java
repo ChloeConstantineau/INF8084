@@ -3,13 +3,15 @@ package ca.polymtl.inf8480.tp2.LDAP;
 import ca.polymtl.inf8480.tp2.shared.*;
 import ca.polymtl.inf8480.tp2.shared.exception.*;
 
+import java.rmi.ConnectException;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.ArrayList;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
-
+import java.rmi.server.UnicastRemoteObject;
 
 public class LDAP implements ILDAP {
 
@@ -17,6 +19,34 @@ public class LDAP implements ILDAP {
     ConcurrentHashMap<String, Credentials> dispatcherRegistry = new ConcurrentHashMap<>();
 
     public LDAP() {
+        super();
+    }
+
+    public static void main(String[] args) {
+        LDAP server = new LDAP();
+        server.run();
+    }
+
+    public void run() {
+        if (System.getSecurityManager() == null) {
+            System.setSecurityManager(new SecurityManager());
+        }
+
+        try {
+            ILDAP stub = (ILDAP) UnicastRemoteObject
+                    .exportObject(this, 0);
+
+            Registry registry = LocateRegistry.getRegistry();
+            registry.rebind("LDAP", stub);
+            System.out.println("LDAP server ready.");
+        } catch (ConnectException e) {
+            System.err
+                    .println("Impossible de se connecter au registre RMI. Est-ce que rmiregistry est lancé ?");
+            System.err.println();
+            System.err.println("Erreur: " + e.getMessage());
+        } catch (Exception e) {
+            System.err.println("Erreur: " + e.getMessage());
+        }
     }
 
     @Override
@@ -24,18 +54,34 @@ public class LDAP implements ILDAP {
         if(!dispatcherRegistry.containsKey(credentials.username)){
             return false;
         }
-        return dispatcherRegistry.get(credentials.username).password == credentials.password;
+        return dispatcherRegistry.get(credentials.username).password.equals(credentials.password);
     }
 
     public void registerDispatcher(Credentials credentials) throws RemoteException {
         try {
-            if(dispatcherRegistry.contains(credentials.username))
+            if (dispatcherRegistry.contains(credentials.username))
                 throw new ServerRegistrationException();
             dispatcherRegistry.put(credentials.username, credentials);
         } catch (NullPointerException e) {
             System.out.println(e.getMessage());
             throw new ServerRegistrationException();
         }
+    }
+
+    @Override
+    public ConcurrentLinkedQueue<String> getAvailableOperationServer(){
+        ArrayList<String> deadServer = new ArrayList<>();
+
+        for (String i: operationServerRegistry) {
+            if(!ping(i))
+                deadServer.add(i);
+        }
+
+        for(String s : deadServer){
+            operationServerRegistry.remove(s);
+        }
+
+        return operationServerRegistry;
     }
 
     @Override
@@ -48,15 +94,6 @@ public class LDAP implements ILDAP {
             System.out.println(e.getMessage());
             throw new ServerRegistrationException();
         }
-    }
-
-    @Override
-    public ConcurrentLinkedQueue<String> getAvailableOperationServer() {
-        for (String i: operationServerRegistry) {
-            if(!ping(i))
-                operationServerRegistry.remove(i);
-        }
-        return operationServerRegistry;
     }
 
     public boolean ping(String hostname){
