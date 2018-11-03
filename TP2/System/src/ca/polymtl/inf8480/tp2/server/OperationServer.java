@@ -5,6 +5,7 @@ import ca.polymtl.inf8480.tp2.shared.IOperationServer;
 
 import java.io.IOException;
 import java.rmi.ConnectException;
+import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
@@ -16,12 +17,11 @@ public class OperationServer implements IOperationServer {
 
 
     public static void main(String[] args){
-        if(!isValide(args)){
+        if(!isValid(args)){
             return;
         }
 
         OperationServer server;
-
         try {
             server = new OperationServer(Float.parseFloat(args[0]));
         } catch (IOException e) {
@@ -42,7 +42,7 @@ public class OperationServer implements IOperationServer {
         System.out.println(s);
     }
 
-    public static boolean isValide(String[] args){
+    public static boolean isValid(String[] args){
         // Check that evilness level has been given
         if(args.length != 1){
             print(ConsoleOutput.NOT_ENOUGH_ARGS.toString());
@@ -79,5 +79,24 @@ public class OperationServer implements IOperationServer {
         } catch (Exception e) {
             System.err.println("Erreur: " + e.getMessage());
         }
+    }
+
+    @Override
+    public void reset(int load) throws RemoteException {
+        this.load = load;
+    }
+
+    private boolean isAvailable() {
+        return true;
+    }
+
+    private boolean isTrustworthy(){
+        return true;
+    }
+
+//    public Collection<Operation> execute(){
+    public void execute(){
+        // check if user is valid
+
     }
 }

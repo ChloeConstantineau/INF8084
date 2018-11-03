@@ -15,23 +15,42 @@
       <file leaf-file-name="IOperationServer.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/ca/polymtl/inf8480/tp2/shared/IOperationServer.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="75">
-              <caret line="5" column="0" lean-forward="false" selection-start-line="5" selection-start-column="0" selection-end-line="5" selection-end-column="0" />
-              <folding />
+            <state relative-caret-position="90">
+              <caret line="6" column="23" lean-forward="false" selection-start-line="6" selection-start-column="23" selection-end-line="6" selection-end-column="23" />
+              <folding>
+                <element signature="imports" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="OperationServer.java" pinned="false" current-in-tab="true">
+      <file leaf-file-name="OperationServer.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/ca/polymtl/inf8480/tp2/server/OperationServer.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="308">
-              <caret line="36" column="23" lean-forward="false" selection-start-line="36" selection-start-column="23" selection-end-line="36" selection-end-column="23" />
+            <state relative-caret-position="540">
+              <caret line="93" column="20" lean-forward="false" selection-start-line="93" selection-start-column="20" selection-end-line="93" selection-end-column="20" />
               <folding>
                 <element signature="imports" expanded="true" />
-                <element signature="e#947#948#0" expanded="true" />
-                <element signature="e#984#985#0" expanded="true" />
+                <element signature="method#main#0;class#OperationServer#0" expanded="false" />
+                <element signature="method#OperationServer#0;class#OperationServer#0" expanded="false" />
+                <element signature="method#isValid#0;class#OperationServer#0" expanded="false" />
+                <element signature="method#run#0;class#OperationServer#0" expanded="false" />
+                <element signature="method#reset#0;class#OperationServer#0" expanded="false" />
+                <element signature="e#2457#2458#0" expanded="true" />
+                <element signature="e#2484#2485#0" expanded="true" />
+                <element signature="e#2522#2523#0" expanded="true" />
+                <element signature="e#2549#2550#0" expanded="true" />
               </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name=".classpath" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/.classpath">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="0">
+              <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+              <folding />
             </state>
           </provider>
         </entry>
@@ -65,8 +84,8 @@
     <option name="CHANGED_PATHS">
       <list>
         <option value="$PROJECT_DIR$/src/ca/polymtl/inf8480/tp2/shared/Operation.java" />
-        <option value="$PROJECT_DIR$/src/ca/polymtl/inf8480/tp2/shared/IOperationServer.java" />
         <option value="$PROJECT_DIR$/src/ca/polymtl/inf8480/tp2/shared/ConsoleOutput.java" />
+        <option value="$PROJECT_DIR$/src/ca/polymtl/inf8480/tp2/shared/IOperationServer.java" />
         <option value="$PROJECT_DIR$/src/ca/polymtl/inf8480/tp2/server/OperationServer.java" />
       </list>
     </option>
@@ -99,31 +118,6 @@
             <path>
               <item name="TP2" type="b2602c69:ProjectViewProjectNode" />
               <item name="System" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="TP2" type="b2602c69:ProjectViewProjectNode" />
-              <item name="System" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="TP2" type="b2602c69:ProjectViewProjectNode" />
-              <item name="System" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="tp2" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="TP2" type="b2602c69:ProjectViewProjectNode" />
-              <item name="System" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="tp2" type="462c0819:PsiDirectoryNode" />
-              <item name="server" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="TP2" type="b2602c69:ProjectViewProjectNode" />
-              <item name="System" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="tp2" type="462c0819:PsiDirectoryNode" />
-              <item name="shared" type="462c0819:PsiDirectoryNode" />
             </path>
           </expand>
           <select />
@@ -248,7 +242,6 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="23" width="1440" height="877" extended-state="6" />
-    <editor active="true" />
     <layout>
       <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
@@ -262,7 +255,7 @@
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
       <window_info id="Capture Tool" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
       <window_info id="Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.24964234" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.24964234" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="UI Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
@@ -317,14 +310,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/ca/polymtl/inf8480/tp2/shared/IOperationServer.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="75">
-          <caret line="5" column="0" lean-forward="false" selection-start-line="5" selection-start-column="0" selection-end-line="5" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/ca/polymtl/inf8480/tp2/shared/ConsoleOutput.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="150">
@@ -333,15 +318,40 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/ca/polymtl/inf8480/tp2/server/OperationServer.java">
+    <entry file="file://$PROJECT_DIR$/src/ca/polymtl/inf8480/tp2/shared/IOperationServer.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="308">
-          <caret line="36" column="23" lean-forward="false" selection-start-line="36" selection-start-column="23" selection-end-line="36" selection-end-column="23" />
+        <state relative-caret-position="90">
+          <caret line="6" column="23" lean-forward="false" selection-start-line="6" selection-start-column="23" selection-end-line="6" selection-end-column="23" />
           <folding>
             <element signature="imports" expanded="true" />
-            <element signature="e#947#948#0" expanded="true" />
-            <element signature="e#984#985#0" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/ca/polymtl/inf8480/tp2/server/OperationServer.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="540">
+          <caret line="93" column="20" lean-forward="false" selection-start-line="93" selection-start-column="20" selection-end-line="93" selection-end-column="20" />
+          <folding>
+            <element signature="imports" expanded="true" />
+            <element signature="method#main#0;class#OperationServer#0" expanded="false" />
+            <element signature="method#OperationServer#0;class#OperationServer#0" expanded="false" />
+            <element signature="method#isValid#0;class#OperationServer#0" expanded="false" />
+            <element signature="method#run#0;class#OperationServer#0" expanded="false" />
+            <element signature="method#reset#0;class#OperationServer#0" expanded="false" />
+            <element signature="e#2457#2458#0" expanded="true" />
+            <element signature="e#2484#2485#0" expanded="true" />
+            <element signature="e#2522#2523#0" expanded="true" />
+            <element signature="e#2549#2550#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/.classpath">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
         </state>
       </provider>
     </entry>
