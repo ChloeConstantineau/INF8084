@@ -1,4 +1,7 @@
 package ca.polymtl.inf8480.tp2.shared;
 
-public interface IOperationServer {
+import java.rmi.Remote;
+
+public interface IOperationServer extends Remote {
+
 }
