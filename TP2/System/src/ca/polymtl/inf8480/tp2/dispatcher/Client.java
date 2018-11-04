@@ -23,6 +23,13 @@ public class Client {
 
         dispatcher = config.secureMode ? new SecureDispatcher() : new UnsecureDispatcher();
 
+        if(dispatcher != null){
+            try{
+                dispatcher.initialize(config);
+            }catch(Exception ioe){
+                System.out.println(ioe.getMessage());
+            }
+        }   
 
         long start = System.nanoTime();
         dispatcher.process();

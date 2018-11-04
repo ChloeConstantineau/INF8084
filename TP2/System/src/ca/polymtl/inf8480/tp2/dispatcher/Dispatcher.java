@@ -79,7 +79,7 @@ public abstract class Dispatcher {
             System.out.println("Error: the given name '" + e.getMessage()
                     + "' is not defined in the registry");
         } catch (NotBoundException e) {
-            System.out.println("Error: " + e.getMessage());
+            System.out.println("Error dnsiafniuùa: " + e.getMessage());
         }
 
         return stub;

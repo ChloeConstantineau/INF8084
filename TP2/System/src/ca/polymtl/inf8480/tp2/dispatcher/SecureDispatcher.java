@@ -8,6 +8,7 @@ public class SecureDispatcher extends Dispatcher {
     public void process() {
         this.operationServers.forEach((k, v) -> {
             try {
+                System.out.println("About to ping...");
                 v.ping();
             }catch (RemoteException e){
                 System.out.println(e.getMessage());

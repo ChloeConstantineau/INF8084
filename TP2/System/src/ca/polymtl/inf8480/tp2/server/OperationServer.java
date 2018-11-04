@@ -39,7 +39,7 @@ public class OperationServer implements IOperationServer {
     }
 
     public OperationServer(int serverId) throws IOException {
-        loadConfiguration(serverId);
+        loadConfiguration(serverId);        
     }
 
     private void loadConfiguration(int id) throws IOException {
@@ -55,12 +55,16 @@ public class OperationServer implements IOperationServer {
         if (System.getSecurityManager() == null) {
             System.setSecurityManager(new SecurityManager());
         }
+        System.out.println(this.configuration.host);
+        System.out.println(this.configuration.port);
 
+        IOperationServer stub = null;
         try {
-            IOperationServer stub = (IOperationServer) UnicastRemoteObject
+            stub = (IOperationServer) UnicastRemoteObject
                     .exportObject(this, this.configuration.port);
 
             Registry registry = LocateRegistry.getRegistry(configuration.host, Constants.RMI_REGISTRY_PORT);
+            
             String specificName = String.format("server_%d", this.configuration.port);
             registry.rebind(specificName, stub);
             System.out.println("OperationServer" + specificName + " ready.");
