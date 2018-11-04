@@ -10,15 +10,19 @@ import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.Random;
 import java.rmi.RemoteException;
+import java.util.Scanner;
 
 public class OperationServer implements IOperationServer {
 
     private OperationServerConfiguration configuration;
 
     public static void main(String[] args) {
+        Scanner reader = new Scanner(System.in);
+        System.out.println(Constants.USER_MENU_OPARATIONS_SERVER);
+        int serverId = reader.nextInt();
+        reader.close();
 
-        int serverId = Integer.parseInt(args[0]);
-        if (args.length != 1 || serverId < 1 || serverId > 4) {
+        if (serverId < 1 || serverId > 4) {
             System.out.println("Selection not handled.. Shutting down.");
             return;
         }
@@ -26,10 +30,6 @@ public class OperationServer implements IOperationServer {
         OperationServer server;
         try {
             server = new OperationServer(serverId);
-            if (!isValidConfiguration(server.configuration)) {
-                System.out.println("Invalid configurations found... Shutting down.");
-                return;
-            }
         } catch (IOException e) {
             e.printStackTrace();
             return;
@@ -44,27 +44,11 @@ public class OperationServer implements IOperationServer {
 
     private void loadConfiguration(int id) throws IOException {
         this.configuration =
-                Parser.<OperationServerConfiguration>parseJson(String.format("server_%d.json", id), OperationServerConfiguration.class);
+                Parser.<OperationServerConfiguration>parseJson(String.format(Constants.DEFAULT_OPERATIONSERVER_CONFIGS + "server_%d.json", id), OperationServerConfiguration.class);
     }
 
     private static void print(String s) {
         System.out.println(s);
-    }
-
-    public static boolean isValidConfiguration(OperationServerConfiguration config) {
-        // Check evilness value is between 0 and 1
-        if (config.m >= 1 || config.m <= 0) {
-            print(ConsoleOutput.WRONG_ARGS.toString());
-            return false;
-        }
-
-        // Check capacity value is above 0
-        if (config.C < 0) {
-            print(ConsoleOutput.POSITIVE_NUMBER_ONLY.toString());
-            return false;
-        }
-
-        return true;
     }
 
     public void run() {

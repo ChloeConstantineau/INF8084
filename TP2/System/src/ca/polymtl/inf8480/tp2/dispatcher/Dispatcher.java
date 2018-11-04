@@ -1,11 +1,9 @@
 package ca.polymtl.inf8480.tp2.dispatcher;
 
-import ca.polymtl.inf8480.tp2.server.OperationServer;
 import ca.polymtl.inf8480.tp2.server.OperationServerConfiguration;
 import ca.polymtl.inf8480.tp2.shared.*;
 import ca.polymtl.inf8480.tp2.shared.Constants;
 
-import javax.security.auth.login.Configuration;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -58,7 +56,7 @@ public abstract class Dispatcher {
             return;
         }
 
-        for (OperationServerConfiguration serverConfig : this.configuration.availableServers) {
+        for (ServerDetails serverConfig : this.configuration.availableServers) {
             IOperationServer stub = this.loadServerStub(serverConfig);
             if (stub != null) {
                 this.operationServers.put(serverConfig.port, stub);
@@ -66,7 +64,7 @@ public abstract class Dispatcher {
         }
     }
 
-    private IOperationServer loadServerStub(OperationServerConfiguration config) {
+    private IOperationServer loadServerStub(ServerDetails config) {
         if (System.getSecurityManager() == null) {
             System.setSecurityManager(new SecurityManager());
         }

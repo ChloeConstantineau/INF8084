@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<project basedir="." default="build-jar" name="TP1">
+<project basedir="." default="build-jar" name="TP2">
 	<property name="debuglevel" value="source,lines,vars" />
-	<path id="TP1.classpath">
+	<path id="TP2.classpath">
 		<pathelement location="bin" />
+		<pathelement location="lib/gson-2.8.2.jar"/>
 	</path>
 	<target name="init">
 		<mkdir dir="bin" />
@@ -21,7 +22,7 @@
 	<target depends="init" name="build-class">
 		<javac debug="true" debuglevel="${debuglevel}" destdir="bin" includeantruntime="false">
 			<src path="src" />
-			<classpath refid="TP1.classpath" />
+			<classpath refid="TP2.classpath" />
 		</javac>
 	</target>
 	<target depends="build-class" name="build-jar">

@@ -16,6 +16,7 @@ public class Parser {
         Path configPath = Paths.get(filename);
 
         if (!Files.exists(configPath) || !configPath.toString().endsWith(".json")) {
+            System.out.println("Could not find file...");
             throw new FileNotFoundException(filename);
         }
 

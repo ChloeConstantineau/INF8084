@@ -1,7 +1,7 @@
 {
-  "secure" : true,
-  "dataFilename" : "./operationFiles/operations-588.txt",
-  "servers" :
+  "secureMode" : true,
+  "filename" : "./operationFiles/operations-588.txt",
+  "availableServers" :
   [
     {
       "host" : "127.0.0.1",

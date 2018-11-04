@@ -7,14 +7,15 @@ public final class Constants {
     public static final int SERVER_MAX_PORT = 5050;
     public static final int MAX_OPERATIONS_PER_TASK = 100;
     public static final int MAX_OPERATION_RETRY = 3;
-    public static final String DEFAULT_DISPATCHER_CONFIGS = "./configs/dispatcher";
+    public static final String DEFAULT_DISPATCHER_CONFIGS = "./configs/dispatcher_configs.json";
+    public static final String DEFAULT_OPERATIONSERVER_CONFIGS = "./configs/operationServer/";
     public static final String DEFAULT_CONFIG_PATH = "./configs/";
     public static final String USER_MENU_OPARATIONS_SERVER =
-            "Choose operation server options :" +
-                    "[1] C = 4, m = 0" +
-                    "[2] C = 5, m = 0 " +
-                    "[3] C = 5, m = 0.5 " +
-                    "[4] C = 5, m = 0.75 ";
+            "Choose operation server options : " + System.lineSeparator() +
+                    "[1] C = 4, m = 0" + System.lineSeparator() +
+                    "[2] C = 5, m = 0" + System.lineSeparator() +
+                    "[3] C = 5, m = 0.5" + System.lineSeparator() +
+                    "[4] C = 5, m = 0.75" + System.lineSeparator();
 }
 
 

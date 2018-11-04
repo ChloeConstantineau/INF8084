@@ -1,5 +1,4 @@
 package ca.polymtl.inf8480.tp2.dispatcher;
-
 import ca.polymtl.inf8480.tp2.shared.Constants;
 import ca.polymtl.inf8480.tp2.shared.Parser;
 
@@ -7,7 +6,7 @@ import java.io.IOException;
 
 public class Client {
 
-    public static void main(String[] args) throws Exception{
+    public static void main(String[] args){
         DispatcherConfiguration config = null;
         Dispatcher dispatcher = null;
 
