@@ -1,0 +1,14 @@
+{
+  "servers" : [
+    {
+      "secure" : true,
+      "C" : 4,
+      "m" : 0
+    },
+    {
+      "secure" : true,
+      "C" : 4,
+      "m" : 0
+    }
+  ]
+}
