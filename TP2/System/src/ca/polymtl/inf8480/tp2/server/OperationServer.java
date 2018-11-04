@@ -13,17 +13,23 @@ import java.rmi.RemoteException;
 
 public class OperationServer implements IOperationServer {
 
-    private float wrongResultRate;
-    private int capacity;
+    private OperationServerConfiguration configuration;
 
     public static void main(String[] args) {
-        if (!isValid(args)) {
+
+        int serverId = Integer.parseInt(args[0]);
+        if (args.length != 1 || serverId < 1 || serverId > 4) {
+            System.out.println("Selection not handled.. Shutting down.");
             return;
         }
 
         OperationServer server;
         try {
-            server = new OperationServer(Float.parseFloat(args[0]), Integer.parseInt(args[1]));
+            server = new OperationServer(serverId);
+            if (!isValidConfiguration(server.configuration)) {
+                System.out.println("Invalid configurations found... Shutting down.");
+                return;
+            }
         } catch (IOException e) {
             e.printStackTrace();
             return;
@@ -32,41 +38,28 @@ public class OperationServer implements IOperationServer {
         server.run();
     }
 
-    public OperationServer(float m, int c) throws IOException {
-        super();
-        wrongResultRate = m;
-        capacity = c;
+    public OperationServer(int serverId) throws IOException {
+        loadConfiguration(serverId);
+    }
 
+    private void loadConfiguration(int id) throws IOException {
+        this.configuration =
+                Parser.<OperationServerConfiguration>parseJson(String.format("server_%d.json", id), OperationServerConfiguration.class);
     }
 
     private static void print(String s) {
         System.out.println(s);
     }
 
-    public static boolean isValid(String[] args) {
-        // Check that evilness level has been given
-        if (args.length != 2) {
-            print(ConsoleOutput.NOT_ENOUGH_ARGS.toString());
-            return false;
-        }
-
-        // Check if could be a number
-        float m;
-        int c;
-        try {
-            m = Float.parseFloat(args[0]);
-            c = Integer.parseInt(args[1]);
-        } catch (NumberFormatException e) {
-            print(ConsoleOutput.NAN.toString());
-            return false;
-        }
-
+    public static boolean isValidConfiguration(OperationServerConfiguration config) {
         // Check evilness value is between 0 and 1
-        if (m > 1 || m < 0) {
+        if (config.m >= 1 || config.m <= 0) {
             print(ConsoleOutput.WRONG_ARGS.toString());
             return false;
         }
-        if (c < 0) {
+
+        // Check capacity value is above 0
+        if (config.C < 0) {
             print(ConsoleOutput.POSITIVE_NUMBER_ONLY.toString());
             return false;
         }
@@ -81,18 +74,19 @@ public class OperationServer implements IOperationServer {
 
         try {
             IOperationServer stub = (IOperationServer) UnicastRemoteObject
-                    .exportObject(this, 0);
+                    .exportObject(this, this.configuration.port);
 
-            Registry registry = LocateRegistry.getRegistry();
-            registry.rebind("server", stub);
-            System.out.println("OperationServer ready.");
+            Registry registry = LocateRegistry.getRegistry(configuration.host, Constants.RMI_REGISTRY_PORT);
+            String specificName = String.format("server_%d", this.configuration.port);
+            registry.rebind(specificName, stub);
+            System.out.println("OperationServer" + specificName + " ready.");
         } catch (ConnectException e) {
             System.err
                     .println("Impossible de se connecter au registre RMI. Est-ce que rmiregistry est lancé ?");
             System.err.println();
-            System.err.println("Erreur: " + e.getMessage());
+            System.err.println("Error: " + e.getMessage());
         } catch (Exception e) {
-            System.err.println("Erreur: " + e.getMessage());
+            System.err.println("Error: " + e.getMessage());
         }
 
         isTrustworthy();
@@ -104,6 +98,7 @@ public class OperationServer implements IOperationServer {
     }
 
     private boolean accept(int taskOperations) {
+        int capacity = configuration.C;
         /* Every opServer will accept a taskNb <= capacity */
         if (taskOperations <= capacity) {
             return true;
@@ -118,7 +113,7 @@ public class OperationServer implements IOperationServer {
 
     private boolean isTrustworthy() {
         float localValue = new Random().nextFloat();
-        return localValue > wrongResultRate;
+        return localValue > configuration.m;
     }
 
     @Override

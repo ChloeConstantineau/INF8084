@@ -1,6 +1,6 @@
 {
   "secure" : true,
-  "dataFilename" : "operations-588.txt",
+  "dataFilename" : "./operationFiles/operations-588.txt",
   "servers" :
   [
     {

@@ -1,8 +1,11 @@
 package ca.polymtl.inf8480.tp2.dispatcher;
 
+import ca.polymtl.inf8480.tp2.server.OperationServer;
+import ca.polymtl.inf8480.tp2.server.OperationServerConfiguration;
 import ca.polymtl.inf8480.tp2.shared.*;
 import ca.polymtl.inf8480.tp2.shared.Constants;
 
+import javax.security.auth.login.Configuration;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -21,7 +24,7 @@ public abstract class Dispatcher {
     protected DispatcherConfiguration configuration = null;
     protected ConcurrentLinkedQueue<Operation> pendingOperations = new ConcurrentLinkedQueue<>();
     protected int nbOperations = 0;
-    protected HashMap<String, IOperationServer> operationServers = new HashMap<>();
+    protected HashMap<Integer, IOperationServer> operationServers = new HashMap<>();
 
     public Dispatcher() {
     }
@@ -55,23 +58,25 @@ public abstract class Dispatcher {
             return;
         }
 
-        for (String serverHostname : this.configuration.availableServers) {
-            IOperationServer stub = this.loadServerStub(serverHostname);
+        for (OperationServerConfiguration serverConfig : this.configuration.availableServers) {
+            IOperationServer stub = this.loadServerStub(serverConfig);
             if (stub != null) {
-                this.operationServers.put(serverHostname, stub);
+                this.operationServers.put(serverConfig.port, stub);
             }
         }
     }
 
-    private IOperationServer loadServerStub(String hostname) {
+    private IOperationServer loadServerStub(OperationServerConfiguration config) {
         if (System.getSecurityManager() == null) {
             System.setSecurityManager(new SecurityManager());
         }
+
         IOperationServer stub = null;
 
         try {
-            Registry registry = hostname == "" ? LocateRegistry.getRegistry() : LocateRegistry.getRegistry(hostname, Constants.RMI_REGISTRY_PORT);
-            stub = (IOperationServer) registry.lookup("server");
+            Registry registry = LocateRegistry.getRegistry(config.host, Constants.RMI_REGISTRY_PORT);
+            String specificName = String.format("server_%d", config.port);
+            stub = (IOperationServer) registry.lookup(specificName);
         } catch (RemoteException e) {
             System.out.println("Error: the given name '" + e.getMessage()
                     + "' is not defined in the registry");

@@ -1,26 +1,37 @@
 package ca.polymtl.inf8480.tp2.dispatcher;
 
+import ca.polymtl.inf8480.tp2.shared.Constants;
+import ca.polymtl.inf8480.tp2.shared.Parser;
+
+import java.io.IOException;
+
 public class Client {
 
     public static void main(String[] args) throws Exception{
+        DispatcherConfiguration config = null;
+        Dispatcher dispatcher = null;
 
-        if (args.length != 2) {
-            throw new Exception("Must receive 2 arguments, received: " + args.length );
+        try{
+            config = loadDispatcherConfiguration(Constants.DEFAULT_DISPATCHER_CONFIGS);
+        }catch(IOException ioe){
+            System.out.println(ioe.getMessage());
+        }finally {
+            if(config == null) {
+                System.out.println("Unable to retreive dispatcher configurations.. Shutting down.");
+                return;
+            }
         }
 
-        String operationsPath = args[0];
+        dispatcher = config.secureMode ? new SecureDispatcher() : new UnsecureDispatcher();
 
-        int isSecure = Integer.parseInt(args[1]);
-        if(isSecure == 1)
-        {
-            System.out.println("Secure mode activated, number of checks: ");
-        }
-        else{
-            System.out.println("Unsecure mode activated, number of checks: ");
-        }
+
         long start = System.nanoTime();
+        dispatcher.process();
         long elapsedTime = System.nanoTime() - start;
         System.out.println("Elapsed time: " + elapsedTime/1000000 + " ms");
     }
 
+    private static DispatcherConfiguration loadDispatcherConfiguration(String filename) throws IOException {
+        return Parser.<DispatcherConfiguration>parseJson(filename, DispatcherConfiguration.class);
+    }
 }
