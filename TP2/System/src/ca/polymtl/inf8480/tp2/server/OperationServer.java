@@ -18,7 +18,7 @@ public class OperationServer implements IOperationServer {
 
     public static void main(String[] args) {
         Scanner reader = new Scanner(System.in);
-        System.out.println(Constants.USER_MENU_OPARATIONS_SERVER);
+        System.out.println(Constants.USER_MENU_OPERATION_SERVER);
         int serverId = reader.nextInt();
         reader.close();
 
