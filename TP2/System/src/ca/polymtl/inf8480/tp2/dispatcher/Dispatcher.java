@@ -10,6 +10,7 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -127,6 +128,29 @@ public abstract class Dispatcher {
             this.nbOperations = this.pendingOperations.size();
         }
     }
+
+    protected void splitOperation(List<Operation> operations){
+        int size = operations.size();
+        List<Operation>firstHalf = new ArrayList<>(operations.subList(0, (size+1)/2));
+        List<Operation>secondHalf = new ArrayList<>(operations.subList((size+1)/2, size));
+    }
+
+    protected void populatePendingOperations(List<Operation> operations){
+        for (Operation op: operations) {
+            this.pendingOperations.add(op);
+        }
+    }
+
+    protected void setFinalResult(){
+
+        for (TaskResult result : this.taskResults)
+        {
+            finalResult += result.result;
+        }
+
+        System.out.println(finalResult);
+    }
+
 
     //To be overridden
     public abstract void dispatch();

@@ -1,6 +1,7 @@
 package ca.polymtl.inf8480.tp2.dispatcher;
 
 import ca.polymtl.inf8480.tp2.shared.Credentials;
+import ca.polymtl.inf8480.tp2.shared.ServerDetails;
 
 import java.util.ArrayList;
 

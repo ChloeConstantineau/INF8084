@@ -1,8 +1,10 @@
 package ca.polymtl.inf8480.tp2.LDAP;
 
+import ca.polymtl.inf8480.tp2.server.OperationServerConfiguration;
 import ca.polymtl.inf8480.tp2.shared.*;
 import ca.polymtl.inf8480.tp2.shared.exception.*;
 
+import java.io.IOException;
 import java.rmi.ConnectException;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;

@@ -43,10 +43,11 @@ public class SecureDispatcher extends Dispatcher {
                         try {
                             TaskResult tResult = stub.execute(this.configuration.credentials, task);
 
-                            //TODO check if tResult hasFailure and deal accordingly
-                            this.taskResults.add(tResult);
-                        } catch (OverloadingServerException e) {
-                            System.out.println(e.getMessage());
+                            if(tResult.hadFailure instanceof OverloadingServerException){
+                                this.populatePendingOperations(toDo);
+                            }else{
+                                this.taskResults.add(tResult);
+                            }
                         }catch(RemoteException e){
                             System.out.println(e.getMessage());
                         }
@@ -60,15 +61,5 @@ public class SecureDispatcher extends Dispatcher {
         }
 
         this.setFinalResult();
-    }
-
-    private void setFinalResult(){
-
-        for (TaskResult result : this.taskResults)
-        {
-            finalResult += result.result;
-        }
-
-        System.out.println(finalResult);
     }
 }
