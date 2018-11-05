@@ -77,8 +77,6 @@ public class OperationServer implements IOperationServer {
         } catch (Exception e) {
             System.err.println("Error: " + e.getMessage());
         }
-
-        isTrustworthy();
     }
 
     @Override

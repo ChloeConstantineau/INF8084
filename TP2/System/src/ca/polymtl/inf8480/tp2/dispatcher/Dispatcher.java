@@ -1,7 +1,6 @@
 package ca.polymtl.inf8480.tp2.dispatcher;
 
 import ca.polymtl.inf8480.tp2.shared.*;
-import ca.polymtl.inf8480.tp2.shared.Operation;
 
 import java.io.IOException;
 import java.rmi.NotBoundException;
@@ -13,6 +12,7 @@ import java.rmi.registry.Registry;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import java.nio.charset.Charset;
@@ -26,7 +26,8 @@ public abstract class Dispatcher {
     protected ConcurrentLinkedQueue<Operation> pendingOperations = new ConcurrentLinkedQueue<Operation>();
     protected ConcurrentLinkedQueue<TaskResult> taskResults = new ConcurrentLinkedQueue<TaskResult>();
     protected int nbOperations = 0;
-    protected HashMap<Integer, IOperationServer> operationServers = new HashMap<Integer, IOperationServer>();
+    protected ConcurrentHashMap<Integer, IOperationServer> operationServers = new ConcurrentHashMap<Integer, IOperationServer>();
+    protected List<Integer> operationServerIds = new ArrayList<>();
     protected int finalResult = 0;
 
     public Dispatcher() {
@@ -66,6 +67,7 @@ public abstract class Dispatcher {
             IOperationServer stub = this.loadServerStub(serverConfig);
             if (stub != null) {
                 this.operationServers.put(serverConfig.port, stub);
+                this.operationServerIds.add(serverConfig.port);
             }
         }
     }
@@ -129,10 +131,9 @@ public abstract class Dispatcher {
         }
     }
 
-    protected void splitOperation(List<Operation> operations){
-        int size = operations.size();
-        List<Operation>firstHalf = new ArrayList<>(operations.subList(0, (size+1)/2));
-        List<Operation>secondHalf = new ArrayList<>(operations.subList((size+1)/2, size));
+    protected void makeTaskEasier(){
+        this.configuration.capacityFactor = this.configuration.capacityFactor > 0 ?
+                this.configuration.capacityFactor-- :  this.configuration.capacityFactor;
     }
 
     protected void populatePendingOperations(List<Operation> operations){
@@ -150,7 +151,6 @@ public abstract class Dispatcher {
 
         System.out.println(finalResult);
     }
-
 
     //To be overridden
     public abstract void dispatch();

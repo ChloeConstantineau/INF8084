@@ -4,12 +4,13 @@ import ca.polymtl.inf8480.tp2.shared.IOperationServer;
 import ca.polymtl.inf8480.tp2.shared.Operation;
 import ca.polymtl.inf8480.tp2.shared.Task;
 import ca.polymtl.inf8480.tp2.shared.TaskResult;
+
 import ca.polymtl.inf8480.tp2.shared.exception.OverloadingServerException;
 
 import java.rmi.RemoteException;
+
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -19,41 +20,49 @@ public class SecureDispatcher extends Dispatcher {
     public void dispatch() {
         ExecutorService executor = Executors.newFixedThreadPool(this.operationServers.size());
 
-        for (Map.Entry<Integer, IOperationServer> calculationServer : this.operationServers.entrySet()) {
-            executor.execute(() -> {
-                IOperationServer stub = calculationServer.getValue();
-                int capacity = 1;
-                try {
-                    capacity = stub.getCapacity();
-                }catch(RemoteException e){
-                    System.out.println("Unable to retrieve server capacity");
-                }
-
-                while (this.pendingOperations.peek() != null) {
-                    List<Operation> toDo = new ArrayList<>();
-                    for (int i = 0; i < capacity && this.pendingOperations.peek() != null; i++) {
-                        Operation op = this.pendingOperations.poll();
-                        toDo.add(op);
+        for (int calculationServerId : this.operationServerIds) {
+            IOperationServer stub = this.operationServers.get(calculationServerId);
+            if (stub != null) {
+                executor.execute(() -> {
+                    int capacity = 0;
+                    try {
+                        capacity = stub.getCapacity();
+                        capacity += this.configuration.capacityFactor;
+                    } catch (RemoteException e) {
+                        System.out.println("Unable to retrieve server capacity.");
                     }
 
-                    if (!toDo.isEmpty()) {
+                    while (this.pendingOperations.peek() != null) {
+                        List<Operation> toDo = new ArrayList<>();
+                        for (int i = 0; i < capacity && this.pendingOperations.peek() != null; i++) {
+                            Operation op = this.pendingOperations.poll();
+                            toDo.add(op);
+                        }
 
-                        Task task = new Task(toDo);
+                        if (!toDo.isEmpty()) {
 
-                        try {
-                            TaskResult tResult = stub.execute(this.configuration.credentials, task);
+                            Task task = new Task(toDo);
 
-                            if(tResult.hadFailure instanceof OverloadingServerException){
-                                this.populatePendingOperations(toDo);
-                            }else{
-                                this.taskResults.add(tResult);
+                            try {
+                                TaskResult tResult = stub.execute(this.configuration.credentials, task);
+
+                                if (tResult.hadFailure == null) {
+                                    this.taskResults.add(tResult);
+                                } else if (tResult.hadFailure instanceof OverloadingServerException) {
+                                    this.makeTaskEasier();
+                                    this.populatePendingOperations(toDo);
+                                } else if (tResult.hadFailure instanceof RemoteException) {
+                                    this.populatePendingOperations(toDo);
+                                    break;
+                                }
+                            } catch (RemoteException e) {
+                                System.out.println(e.getMessage());
+                                break;
                             }
-                        }catch(RemoteException e){
-                            System.out.println(e.getMessage());
                         }
                     }
-                }
-            });
+                });
+            }
         }
 
         executor.shutdown();
