@@ -1,6 +1,11 @@
-#useless file
-*./TP1/Partie_2/bin
-*./TP2/.idea
-*./TP2/System/bin
-*./TP2/System/out
-*./TP2/System/.idea
+#Omit compiled files
+TP2/System/bin
+TP2/System/out
+
+# IntelliJ settings
+.idea
+
+# Package Files #
+*.jar
+*.war
+*.ear
