@@ -10,4 +10,5 @@ public final class Constants {
     public static final String DEFAULT_OPERATION_SERVER_CONFIGS = "./configs/operationServer/";
     public static final String OPERATION_DATA_PATH = "./operationFiles/";
     public static final String HOSTNAME = "127.0.0.1";
+    public static final String LDAP_CONFIGS_PATH = "./configs/LDAP.json";
 }

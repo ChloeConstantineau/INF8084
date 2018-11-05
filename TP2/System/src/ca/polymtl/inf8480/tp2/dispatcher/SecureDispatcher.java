@@ -4,12 +4,13 @@ import ca.polymtl.inf8480.tp2.shared.IOperationServer;
 import ca.polymtl.inf8480.tp2.shared.Operation;
 import ca.polymtl.inf8480.tp2.shared.Task;
 import ca.polymtl.inf8480.tp2.shared.TaskResult;
+
 import ca.polymtl.inf8480.tp2.shared.exception.OverloadingServerException;
 
 import java.rmi.RemoteException;
+
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -19,40 +20,49 @@ public class SecureDispatcher extends Dispatcher {
     public void dispatch() {
         ExecutorService executor = Executors.newFixedThreadPool(this.operationServers.size());
 
-        for (Map.Entry<Integer, IOperationServer> calculationServer : this.operationServers.entrySet()) {
-            executor.execute(() -> {
-                IOperationServer stub = calculationServer.getValue();
-                int capacity = 1;
-                try {
-                    capacity = stub.getCapacity();
-                }catch(RemoteException e){
-                    System.out.println("Unable to retrieve server capacity");
-                }
-
-                while (this.pendingOperations.peek() != null) {
-                    List<Operation> toDo = new ArrayList<>();
-                    for (int i = 0; i < capacity && this.pendingOperations.peek() != null; i++) {
-                        Operation op = this.pendingOperations.poll();
-                        toDo.add(op);
+        for (int calculationServerId : this.operationServerIds) {
+            IOperationServer stub = this.operationServers.get(calculationServerId);
+            if (stub != null) {
+                executor.execute(() -> {
+                    int capacity = 0;
+                    try {
+                        capacity = stub.getCapacity();
+                        capacity += this.configuration.capacityFactor;
+                    } catch (RemoteException e) {
+                        System.out.println("Unable to retrieve server capacity.");
                     }
 
-                    if (!toDo.isEmpty()) {
+                    while (this.pendingOperations.peek() != null) {
+                        List<Operation> toDo = new ArrayList<>();
+                        for (int i = 0; i < capacity && this.pendingOperations.peek() != null; i++) {
+                            Operation op = this.pendingOperations.poll();
+                            toDo.add(op);
+                        }
 
-                        Task task = new Task(toDo);
+                        if (!toDo.isEmpty()) {
 
-                        try {
-                            TaskResult tResult = stub.execute(this.configuration.credentials, task);
+                            Task task = new Task(toDo);
 
-                            //TODO check if tResult hasFailure and deal accordingly
-                            this.taskResults.add(tResult);
-                        } catch (OverloadingServerException e) {
-                            System.out.println(e.getMessage());
-                        }catch(RemoteException e){
-                            System.out.println(e.getMessage());
+                            try {
+                                TaskResult tResult = stub.execute(this.configuration.credentials, task);
+
+                                if (tResult.hadFailure == null) {
+                                    this.taskResults.add(tResult);
+                                } else if (tResult.hadFailure instanceof OverloadingServerException) {
+                                    this.makeTaskEasier();
+                                    this.populatePendingOperations(toDo);
+                                } else if (tResult.hadFailure instanceof RemoteException) {
+                                    this.populatePendingOperations(toDo);
+                                    break;
+                                }
+                            } catch (RemoteException e) {
+                                System.out.println(e.getMessage());
+                                break;
+                            }
                         }
                     }
-                }
-            });
+                });
+            }
         }
 
         executor.shutdown();
@@ -60,15 +70,5 @@ public class SecureDispatcher extends Dispatcher {
         }
 
         this.setFinalResult();
-    }
-
-    private void setFinalResult(){
-
-        for (TaskResult result : this.taskResults)
-        {
-            finalResult += result.result;
-        }
-
-        System.out.println(finalResult);
     }
 }

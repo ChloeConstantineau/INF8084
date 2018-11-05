@@ -10,6 +10,7 @@ public class DispatcherConfiguration {
     public boolean secureMode;
     public String fileName;
     public ArrayList<ServerDetails> availableServers;
+    public int capacityFactor;
 
     public DispatcherConfiguration() {
         credentials = Credentials.of("", "");

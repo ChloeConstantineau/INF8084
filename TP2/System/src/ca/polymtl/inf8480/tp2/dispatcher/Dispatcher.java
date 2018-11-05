@@ -1,7 +1,6 @@
 package ca.polymtl.inf8480.tp2.dispatcher;
 
 import ca.polymtl.inf8480.tp2.shared.*;
-import ca.polymtl.inf8480.tp2.shared.Operation;
 
 import java.io.IOException;
 import java.rmi.NotBoundException;
@@ -10,8 +9,10 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import java.nio.charset.Charset;
@@ -25,7 +26,8 @@ public abstract class Dispatcher {
     protected ConcurrentLinkedQueue<Operation> pendingOperations = new ConcurrentLinkedQueue<Operation>();
     protected ConcurrentLinkedQueue<TaskResult> taskResults = new ConcurrentLinkedQueue<TaskResult>();
     protected int nbOperations = 0;
-    protected HashMap<Integer, IOperationServer> operationServers = new HashMap<Integer, IOperationServer>();
+    protected ConcurrentHashMap<Integer, IOperationServer> operationServers = new ConcurrentHashMap<Integer, IOperationServer>();
+    protected List<Integer> operationServerIds = new ArrayList<>();
     protected int finalResult = 0;
 
     private ILDAP LDAPstub;
@@ -91,6 +93,7 @@ public abstract class Dispatcher {
             IOperationServer stub = this.loadServerStub(serverConfig);
             if (stub != null) {
                 this.operationServers.put(serverConfig.port, stub);
+                this.operationServerIds.add(serverConfig.port);
             }
         }
     }
@@ -152,6 +155,27 @@ public abstract class Dispatcher {
         if (this.pendingOperations != null) {
             this.nbOperations = this.pendingOperations.size();
         }
+    }
+
+    protected void makeTaskEasier(){
+        this.configuration.capacityFactor = this.configuration.capacityFactor > 0 ?
+                this.configuration.capacityFactor-- :  this.configuration.capacityFactor;
+    }
+
+    protected void populatePendingOperations(List<Operation> operations){
+        for (Operation op: operations) {
+            this.pendingOperations.add(op);
+        }
+    }
+
+    protected void setFinalResult(){
+
+        for (TaskResult result : this.taskResults)
+        {
+            finalResult += result.result;
+        }
+
+        System.out.println(finalResult);
     }
 
     //To be overridden
