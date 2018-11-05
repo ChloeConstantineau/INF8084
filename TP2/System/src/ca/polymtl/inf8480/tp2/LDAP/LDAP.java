@@ -1,4 +1,4 @@
-package ca.polymtl.inf8480.tp2.LDAP;
+package ca.polymtl.inf8480.tp2.ldap;
 
 import ca.polymtl.inf8480.tp2.shared.*;
 import ca.polymtl.inf8480.tp2.shared.exception.*;
@@ -53,6 +53,7 @@ public class LDAP implements ILDAP {
 
     @Override
     public boolean authenticateDispatcher(Credentials credentials) {
+        System.out.println("Authenticating register");
         if (!dispatcherRegistry.containsKey(credentials.username)) {
             return false;
         }
@@ -60,6 +61,7 @@ public class LDAP implements ILDAP {
     }
 
     public void registerDispatcher(Credentials credentials) throws RemoteException {
+        System.out.println("Registering dispatcher");
         try {
             if (dispatcherRegistry.contains(credentials.username))
                 throw new ServerRegistrationException();
@@ -88,6 +90,7 @@ public class LDAP implements ILDAP {
 
     @Override
     public void registerOperationServer(String hostname) throws RemoteException {
+        System.out.println("Registering Operation Server");
         try {
             if (operationServerRegistry.contains(hostname))
                 throw new ServerRegistrationException();

@@ -18,6 +18,7 @@
 		<delete file="operationServer.jar" />
 		<delete file="shared.jar" />
 		<delete file="dispatcher.jar" />
+		<delete file="LDAP.jar" />
 	</target>
 	<target depends="init" name="build-class">
 		<javac debug="true" debuglevel="${debuglevel}" destdir="bin" includeantruntime="false">
@@ -26,8 +27,9 @@
 		</javac>
 	</target>
 	<target depends="build-class" name="build-jar">
-		<jar destfile="shared.jar" basedir="bin" includes="ca/polymtl/inf8480/tp2/shared/**" update="false" />
-		<jar destfile="operationServer.jar" basedir="bin" includes="ca/polymtl/inf8480/tp2/server/**" update="false" />
-		<jar destfile="dispatcher.jar" basedir="bin" includes="ca/polymtl/inf8480/tp2/dispatcher/**" update="false" />
-	</target>
+        <jar destfile="shared.jar" basedir="bin" includes="ca/polymtl/inf8480/tp2/shared/**" update="false" />
+        <jar destfile="operationServer.jar" basedir="bin" includes="ca/polymtl/inf8480/tp2/server/**" update="false" />
+        <jar destfile="dispatcher.jar" basedir="bin" includes="ca/polymtl/inf8480/tp2/dispatcher/**" update="false" />
+        <jar destfile="LDAP.jar" basedir="bin" includes="ca/polymtl/inf8480/tp2/ldap/**" update="false" />
+    </target>
 </project>

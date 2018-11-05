@@ -1,4 +1,4 @@
-package ca.polymtl.inf8480.tp2.dispatcher;
+package ca.polymtl.inf8480.tp2.shared;
 
 public class ServerDetails {
 

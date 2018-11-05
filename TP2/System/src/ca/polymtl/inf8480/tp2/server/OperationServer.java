@@ -1,10 +1,12 @@
 package ca.polymtl.inf8480.tp2.server;
 
+import ca.polymtl.inf8480.tp2.shared.ServerDetails;
 import ca.polymtl.inf8480.tp2.shared.*;
 import ca.polymtl.inf8480.tp2.shared.exception.*;
 
 import java.io.IOException;
 import java.rmi.ConnectException;
+import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 
@@ -14,8 +16,10 @@ import java.util.Random;
 
 public class OperationServer implements IOperationServer {
 
+    private String uniqueName = "";
     private OperationServerConfiguration configuration;
     private ILDAP LDAPStub;
+    private ServerDetails LDAPconfiguration;
 
     public static void main(String[] args) {
         int serverId = Integer.parseInt(args[0]);
@@ -37,17 +41,32 @@ public class OperationServer implements IOperationServer {
 
     public OperationServer(int serverId) throws IOException {
         loadConfiguration(serverId);
-        loadLDAPStub();
+        LDAPStub = (ILDAP) loadLDAPInterface(LDAPconfiguration.host, "LDAP");
+    }
+
+    private ILDAP loadLDAPInterface(String hostname, String registryName) {
+        ILDAP stub = null;
+
+        System.out.println("Loading LDAP stub");
+        try {
+            Registry registry = LocateRegistry.getRegistry(hostname);
+            stub = (ILDAP) registry.lookup(registryName);
+        } catch (NotBoundException e) {
+            System.out.println(ConsoleOutput.REGISTRY_NOT_FOUND.toString() + " : " + registryName);
+        } catch (RemoteException e) {
+            System.out.println("Error: " + e.getMessage());
+        }
+
+        return stub;
     }
 
     private void loadConfiguration(int id) throws IOException {
         this.configuration =
                 Parser.<OperationServerConfiguration>parseJson(String.format(Constants.DEFAULT_OPERATION_SERVER_CONFIGS +
                         "server_%d.json", id), OperationServerConfiguration.class);
-    }
 
-    private void loadLDAPStub(){
-
+        System.out.println("Breaking here?");
+        LDAPconfiguration = Parser.loadLDAPDetails();
     }
 
     public void run() {
@@ -60,14 +79,16 @@ public class OperationServer implements IOperationServer {
 
         IOperationServer stub = null;
         try {
-            stub = (IOperationServer) UnicastRemoteObject
-                    .exportObject(this, this.configuration.port);
+            stub = (IOperationServer) UnicastRemoteObject.exportObject(this, this.configuration.port);
 
             Registry registry = LocateRegistry.getRegistry(configuration.host, Constants.RMI_REGISTRY_PORT);
 
-            String specificName = String.format("server_%d_%d", this.configuration.host, this.configuration.port);
-            registry.rebind(specificName, stub);
-            System.out.println("OperationServer" + specificName + " ready.");
+            uniqueName = String.format("server_%d", this.configuration.port);
+            registry.rebind(uniqueName, stub);
+            System.out.println("OperationServer" + uniqueName + " ready.");
+
+            // register server with LDAP
+            LDAPStub.registerOperationServer(uniqueName);
         } catch (ConnectException e) {
             System.err
                     .println("Impossible de se connecter au registre RMI. Est-ce que rmiregistry est lancé ?");
@@ -109,13 +130,16 @@ public class OperationServer implements IOperationServer {
 
     @Override
     public TaskResult execute(Credentials credentials, Task task) throws RemoteException {
-        // check if user is valid
-        //try{
-        //    if(!this.LDAPStub.authenticateDispatcher(credentials))
-        //       return null;
-        //}catch(RemoteException e){
-        //   print(e.getMessage());
-        //}
+        // check if dispatcher is valid 10% of the time
+        float value = new Random().nextFloat();
+        if(value <= 0.1){
+            try{
+                if(!LDAPStub.authenticateDispatcher(credentials))
+                    return null;
+            } catch(RemoteException e){
+                print(e.getMessage());
+            }
+        }
 
         // check if server accepts task
         if (!accept(task.operations.size())) {

@@ -37,4 +37,8 @@ public class Parser {
 
         return configs;
     }
+
+    public static ServerDetails loadLDAPDetails() throws IOException {
+        return Parser.<ServerDetails>parseJson(Constants.LDAP_CONFIGS_PATH, ServerDetails.class);
+    }
 }
