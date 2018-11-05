@@ -8,7 +8,7 @@ public final class Constants {
     public static final int MAX_OPERATIONS_PER_TASK = 100;
     public static final int MAX_OPERATION_RETRY = 3;
     public static final String DEFAULT_DISPATCHER_CONFIGS = "./configs/dispatcher_configs.json";
-    public static final String DEFAULT_OPERATIONSERVER_CONFIGS = "./configs/operationServer/";
+    public static final String DEFAULT_OPERATIONSERVER_CONFIGS = "./operationFiles/operationServer/";
     public static final String DEFAULT_CONFIG_PATH = "./configs/";
     public static final String USER_MENU_OPARATIONS_SERVER =
             "Choose operation server options : " + System.lineSeparator() +
