@@ -1,8 +1,6 @@
 package ca.polymtl.inf8480.tp2.dispatcher;
 
-import ca.polymtl.inf8480.tp2.server.OperationServerConfiguration;
 import ca.polymtl.inf8480.tp2.shared.*;
-import ca.polymtl.inf8480.tp2.shared.Constants;
 
 import java.io.IOException;
 import java.rmi.NotBoundException;
@@ -11,7 +9,6 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -24,9 +21,9 @@ import java.nio.file.Paths;
 public abstract class Dispatcher {
 
     protected DispatcherConfiguration configuration = null;
-    protected ConcurrentLinkedQueue<Operation> pendingOperations = new ConcurrentLinkedQueue<Operation>();;
+    protected ConcurrentLinkedQueue<Operation> pendingOperations = new ConcurrentLinkedQueue<Operation>();
     protected int nbOperations = 0;
-    protected HashMap<Integer, IOperationServer> operationServers = new HashMap<Integer, IOperationServer>();;
+    protected HashMap<Integer, IOperationServer> operationServers = new HashMap<Integer, IOperationServer>();
 
     public Dispatcher() {
     }
@@ -52,13 +49,14 @@ public abstract class Dispatcher {
             System.out.println("No operations found...");
             return;
         }
-
     }
 
     private final void loadOperationStubs() {
         if (this.configuration == null) {
             return;
         }
+
+        System.out.println("Loading server stubs.");
 
         for (ServerDetails serverConfig : this.configuration.availableServers) {
             IOperationServer stub = this.loadServerStub(serverConfig);
@@ -83,23 +81,22 @@ public abstract class Dispatcher {
             System.out.println("Error: the given name '" + e.getMessage()
                     + "' is not defined in the registry");
         } catch (NotBoundException e) {
-            System.out.println("Error dnsiafniuùa: " + e.getMessage());
+            System.out.println("Error: " + e.getMessage());
         }
 
         return stub;
     }
 
     private final void loadOperationsFromFile(String fileLocation) {
-        System.out.println("starting..");
+        System.out.println("Loading operations from file : " + fileLocation);
         Path filePath = Paths.get(fileLocation);
 
-		if (!Files.exists(filePath)) {
-			System.out.println("Could not find operations file... ");
+        if (!Files.exists(filePath)) {
+            System.out.println("Could not find operations' file... ");
             return;
-		}     
+        }
 
         try {
-
             Charset cs = Charset.forName("utf-8");
             List<String> instructions = Files.readAllLines(filePath, cs);
 
@@ -108,30 +105,26 @@ public abstract class Dispatcher {
                 if (instructionElements.length != 2) {
                     continue;
                 }
-                
+
                 String fct = instructionElements[0];
                 int value = Integer.parseInt(instructionElements[1]);
-                
-                
-                
-                if (fct.equals(OperationType.Pell.toString())){
+
+                if (fct.equals(OperationType.Pell.toString())) {
                     this.pendingOperations.add(Operation.of(OperationType.Pell, value));
+                } else if (fct.equals(OperationType.Prime.toString())) {
+                    this.pendingOperations.add(Operation.of(OperationType.Prime, value));
                 }
-                else if (fct.equals(OperationType.Prime.toString())){
-                    this.pendingOperations.add(Operation.of(OperationType.Prime, value)); 
-                }       
             }
 
         } catch (IOException e) {
             System.out.println("Unable to read from file..");
         }
 
-		if (this.pendingOperations != null) {
-			this.nbOperations = this.pendingOperations.size();
+        if (this.pendingOperations != null) {
+            this.nbOperations = this.pendingOperations.size();
         }
     }
 
     //To be overridden
     public abstract void process();
-
 }

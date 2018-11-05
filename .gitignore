@@ -1,3 +1,6 @@
 #useless file
-*.jar
 *./TP1/Partie_2/bin
+*./TP2/.idea
+*./TP2/System/bin
+*./TP2/System/out
+*./TP2/System/.idea

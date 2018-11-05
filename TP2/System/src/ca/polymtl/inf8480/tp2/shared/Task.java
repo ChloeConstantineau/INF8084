@@ -7,15 +7,15 @@ public class Task implements Serializable {
 
     public List<Operation> operations;
 
-    public Task(List<Operation> operations){
+    public Task(List<Operation> operations) {
         this.operations = operations;
     }
 
-    public void addOperation(Operation operation){
+    public void addOperation(Operation operation) {
         operations.add(operation);
     }
 
-    public void addOperation(OperationType type, int value){
-        operations.add(Operation.of(type,value));
+    public void addOperation(OperationType type, int value) {
+        operations.add(Operation.of(type, value));
     }
 }

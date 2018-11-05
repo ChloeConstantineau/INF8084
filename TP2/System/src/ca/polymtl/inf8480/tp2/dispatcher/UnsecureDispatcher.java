@@ -8,8 +8,9 @@ public class UnsecureDispatcher extends Dispatcher {
     public void process() {
         this.operationServers.forEach((k, v) -> {
             try {
-                v.ping();
-            }catch (RemoteException e){
+                String response = v.ping();
+                System.out.println(response);
+            } catch (RemoteException e) {
                 System.out.println(e.getMessage());
             }
         });

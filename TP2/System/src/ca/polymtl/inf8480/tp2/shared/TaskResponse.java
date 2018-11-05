@@ -10,7 +10,7 @@ public class TaskResponse implements Serializable {
         return new TaskResponse(result, details);
     }
 
-    private TaskResponse(int result, String details){
+    private TaskResponse(int result, String details) {
         this.result = result;
         this.details = details;
     }

@@ -6,9 +6,11 @@ import ca.polymtl.inf8480.tp2.shared.exception.*;
 import java.rmi.ConnectException;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
+
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.ArrayList;
 import java.util.concurrent.ConcurrentLinkedQueue;
+
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
@@ -34,7 +36,7 @@ public class LDAP implements ILDAP {
 
         try {
             ILDAP stub = (ILDAP) UnicastRemoteObject
-                    .exportObject(this, 0);
+                    .exportObject(this, Constants.LDAP_PORT);
 
             Registry registry = LocateRegistry.getRegistry();
             registry.rebind("LDAP", stub);
@@ -43,15 +45,15 @@ public class LDAP implements ILDAP {
             System.err
                     .println("Impossible de se connecter au registre RMI. Est-ce que rmiregistry est lancé ?");
             System.err.println();
-            System.err.println("Erreur: " + e.getMessage());
+            System.err.println("Error: " + e.getMessage());
         } catch (Exception e) {
-            System.err.println("Erreur: " + e.getMessage());
+            System.err.println("Error: " + e.getMessage());
         }
     }
 
     @Override
     public boolean authenticateDispatcher(Credentials credentials) {
-        if(!dispatcherRegistry.containsKey(credentials.username)){
+        if (!dispatcherRegistry.containsKey(credentials.username)) {
             return false;
         }
         return dispatcherRegistry.get(credentials.username).password.equals(credentials.password);
@@ -69,15 +71,15 @@ public class LDAP implements ILDAP {
     }
 
     @Override
-    public ConcurrentLinkedQueue<String> getAvailableOperationServer(){
+    public ConcurrentLinkedQueue<String> getAvailableOperationServer() {
         ArrayList<String> deadServer = new ArrayList<>();
 
-        for (String i: operationServerRegistry) {
-            if(!ping(i))
+        for (String i : operationServerRegistry) {
+            if (!ping(i))
                 deadServer.add(i);
         }
 
-        for(String s : deadServer){
+        for (String s : deadServer) {
             operationServerRegistry.remove(s);
         }
 
@@ -87,7 +89,7 @@ public class LDAP implements ILDAP {
     @Override
     public void registerOperationServer(String hostname) throws RemoteException {
         try {
-            if(operationServerRegistry.contains(hostname))
+            if (operationServerRegistry.contains(hostname))
                 throw new ServerRegistrationException();
             operationServerRegistry.add(hostname);
         } catch (NullPointerException e) {
@@ -96,7 +98,7 @@ public class LDAP implements ILDAP {
         }
     }
 
-    public boolean ping(String hostname){
+    public boolean ping(String hostname) {
         if (hostname == null) {
             throw new IllegalArgumentException();
         }

@@ -1,16 +1,15 @@
 package ca.polymtl.inf8480.tp2.server;
 
 import ca.polymtl.inf8480.tp2.shared.*;
-import ca.polymtl.inf8480.tp2.shared.exception.OverloadingServerException;
+import ca.polymtl.inf8480.tp2.shared.exception.*;
 
 import java.io.IOException;
 import java.rmi.ConnectException;
 import java.rmi.registry.LocateRegistry;
+
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.Random;
-import java.rmi.RemoteException;
-import java.util.Scanner;
 
 public class OperationServer implements IOperationServer {
 
@@ -35,24 +34,22 @@ public class OperationServer implements IOperationServer {
     }
 
     public OperationServer(int serverId) throws IOException {
-        loadConfiguration(serverId);        
+        loadConfiguration(serverId);
     }
 
     private void loadConfiguration(int id) throws IOException {
         this.configuration =
-                Parser.<OperationServerConfiguration>parseJson(String.format(Constants.DEFAULT_OPERATIONSERVER_CONFIGS + "server_%d.json", id), OperationServerConfiguration.class);
-    }
-
-    private static void print(String s) {
-        System.out.println(s);
+                Parser.<OperationServerConfiguration>parseJson(String.format(Constants.DEFAULT_OPERATION_SERVER_CONFIGS +
+                        "server_%d.json", id), OperationServerConfiguration.class);
     }
 
     public void run() {
         if (System.getSecurityManager() == null) {
             System.setSecurityManager(new SecurityManager());
         }
-        System.out.println(this.configuration.host);
-        System.out.println(this.configuration.port);
+
+        print(this.configuration.host);
+        print(Integer.toString(this.configuration.port));
 
         IOperationServer stub = null;
         try {
@@ -60,7 +57,7 @@ public class OperationServer implements IOperationServer {
                     .exportObject(this, this.configuration.port);
 
             Registry registry = LocateRegistry.getRegistry(configuration.host, Constants.RMI_REGISTRY_PORT);
-            
+
             String specificName = String.format("server_%d", this.configuration.port);
             registry.rebind(specificName, stub);
             System.out.println("OperationServer" + specificName + " ready.");
@@ -77,7 +74,7 @@ public class OperationServer implements IOperationServer {
     }
 
     @Override
-    public String ping() throws RemoteException {
+    public String ping() {
         return "Pong!";
     }
 
@@ -139,5 +136,9 @@ public class OperationServer implements IOperationServer {
     private TaskResponse untrustedResponse() {
         int fakeValue = new Random().nextInt(Integer.MAX_VALUE);
         return TaskResponse.of(fakeValue, ConsoleOutput.WRONG_RESULT.toString());
+    }
+
+    private static void print(String s) {
+        System.out.println(s);
     }
 }

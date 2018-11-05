@@ -4,7 +4,7 @@ public class Operation {
     public OperationType type;
     public int value;
 
-    public static Operation of(OperationType type, int value){
+    public static Operation of(OperationType type, int value) {
         return new Operation(type, value);
     }
 

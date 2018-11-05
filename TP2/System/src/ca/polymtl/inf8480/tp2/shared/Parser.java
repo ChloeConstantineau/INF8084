@@ -12,7 +12,7 @@ import com.google.gson.JsonParseException;
 
 public class Parser {
 
-    public static <T> T parseJson(String filename, Class<T> clazz) throws IOException {
+    public static <T> T parseJson(String filename, Class<T> tClass) throws IOException {
         Path configPath = Paths.get(filename);
 
         if (!Files.exists(configPath) || !configPath.toString().endsWith(".json")) {
@@ -20,14 +20,14 @@ public class Parser {
             throw new FileNotFoundException(filename);
         }
 
-        System.out.println("Loading configuration for " +  clazz.toString());
+        System.out.println("Loading configuration for " + tClass.toString());
         String json = new String(Files.readAllBytes(configPath));
 
         T configs = null;
         try {
             GsonBuilder builder = new GsonBuilder();
             Gson gson = builder.create();
-            configs = gson.fromJson(json, clazz);
+            configs = gson.fromJson(json, tClass);
         } catch (JsonParseException jpe) {
             System.out.println("Unable to parse correctly ...");
             jpe.printStackTrace();

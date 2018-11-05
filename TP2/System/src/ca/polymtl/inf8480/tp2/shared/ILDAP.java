@@ -7,7 +7,10 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 public interface ILDAP extends Remote {
 
     void registerDispatcher(Credentials credentials) throws RemoteException;
+
     boolean authenticateDispatcher(Credentials credentials) throws RemoteException;
+
     ConcurrentLinkedQueue<String> getAvailableOperationServer() throws RemoteException;
+
     void registerOperationServer(String hostname) throws RemoteException;
 }

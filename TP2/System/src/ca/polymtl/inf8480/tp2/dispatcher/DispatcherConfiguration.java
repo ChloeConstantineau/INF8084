@@ -8,7 +8,7 @@ public class DispatcherConfiguration {
     public String fileName;
     public ArrayList<ServerDetails> availableServers;
 
-    public DispatcherConfiguration(){
+    public DispatcherConfiguration() {
         availableServers = new ArrayList<>();
     }
 }

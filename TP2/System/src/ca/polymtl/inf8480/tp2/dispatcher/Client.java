@@ -1,40 +1,39 @@
 package ca.polymtl.inf8480.tp2.dispatcher;
-import ca.polymtl.inf8480.tp2.shared.Constants;
-import ca.polymtl.inf8480.tp2.shared.Parser;
+
+import ca.polymtl.inf8480.tp2.shared.*;
 
 import java.io.IOException;
 
 public class Client {
 
-    public static void main(String[] args){
+    public static void main(String[] args) {
         DispatcherConfiguration config = null;
-        Dispatcher dispatcher = null;
 
-        try{
+        try {
             config = loadDispatcherConfiguration(Constants.DEFAULT_DISPATCHER_CONFIGS);
-        }catch(IOException ioe){
+        } catch (IOException ioe) {
             System.out.println(ioe.getMessage());
-        }finally {
-            if(config == null) {
-                System.out.println("Unable to retreive dispatcher configurations.. Shutting down.");
+        } finally {
+            if (config == null) {
+                System.out.println("Unable to retrieve dispatcher configurations.. Shutting down.");
                 return;
             }
         }
 
-        dispatcher = config.secureMode ? new SecureDispatcher() : new UnsecureDispatcher();
+        Dispatcher dispatcher = config.secureMode ? new SecureDispatcher() : new UnsecureDispatcher();
 
-        if(dispatcher != null){
-            try{
+        if (dispatcher != null) {
+            try {
                 dispatcher.initialize(config);
-            }catch(Exception ioe){
+            } catch (Exception ioe) {
                 System.out.println(ioe.getMessage());
             }
-        }   
+        }
 
         long start = System.nanoTime();
         dispatcher.process();
         long elapsedTime = System.nanoTime() - start;
-        System.out.println("Elapsed time: " + elapsedTime/1000000 + " ms");
+        System.out.println("Elapsed time: " + elapsedTime / 1000000 + " ms");
     }
 
     private static DispatcherConfiguration loadDispatcherConfiguration(String filename) throws IOException {

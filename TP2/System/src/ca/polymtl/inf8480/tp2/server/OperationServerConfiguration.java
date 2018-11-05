@@ -8,7 +8,7 @@ public class OperationServerConfiguration {
     public int port;
     public String host;
 
-    public OperationServerConfiguration(int capacity, int mischievous, int portNumber, String hostname){
+    public OperationServerConfiguration(int capacity, int mischievous, int portNumber, String hostname) {
         if (port < Constants.SERVER_MIN_PORT || port > Constants.SERVER_MAX_PORT) {
             throw new IllegalArgumentException("Port should be between 5000 and 5500");
         }
