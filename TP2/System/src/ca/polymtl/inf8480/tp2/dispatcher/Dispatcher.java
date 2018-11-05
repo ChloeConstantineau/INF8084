@@ -28,6 +28,8 @@ public abstract class Dispatcher {
     protected HashMap<Integer, IOperationServer> operationServers = new HashMap<Integer, IOperationServer>();
     protected int finalResult = 0;
 
+    private ILDAP LDAPstub;
+
     public Dispatcher() {
     }
 
@@ -37,6 +39,14 @@ public abstract class Dispatcher {
         }
 
         this.configuration = configuration;
+
+        // get LDAP stub and register Dispatcher with LDAP
+        LDAPstub = (ILDAP) loadLDAPInterface(Constants.HOSTNAME, "LDAP");
+        try {
+            LDAPstub.registerDispatcher(configuration.credentials);
+        } catch (RemoteException e) {
+            System.out.println(e.getMessage());
+        }
 
         this.loadOperationStubs();
 
@@ -52,6 +62,22 @@ public abstract class Dispatcher {
             System.out.println("No operations found...");
             return;
         }
+    }
+
+    private ILDAP loadLDAPInterface(String hostname, String registryName) {
+        ILDAP stub = null;
+
+        System.out.println("Loading LDAP stub");
+        try {
+            Registry registry = LocateRegistry.getRegistry(hostname);
+            stub = (ILDAP) registry.lookup(registryName);
+        } catch (NotBoundException e) {
+            System.out.println(ConsoleOutput.REGISTRY_NOT_FOUND.toString() + " : " + registryName);
+        } catch (RemoteException e) {
+            System.out.println("Error: " + e.getMessage());
+        }
+
+        return stub;
     }
 
     private final void loadOperationStubs() {  //TODO : change for LDAP list

@@ -1,6 +1,12 @@
 package ca.polymtl.inf8480.tp2.shared;
 
 public enum ConsoleOutput {
+    REGISTRY_NOT_FOUND {
+        @Override
+        public String toString() {
+            return "The given registry name was not found.";
+        }
+    },
     WRONG_RESULT {
         @Override
         public String toString() {
