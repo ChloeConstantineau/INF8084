@@ -10,7 +10,6 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -29,6 +28,7 @@ public abstract class Dispatcher {
     protected ConcurrentHashMap<Integer, IOperationServer> operationServers = new ConcurrentHashMap<Integer, IOperationServer>();
     protected List<Integer> operationServerIds = new ArrayList<>();
     protected int finalResult = 0;
+    private ServerDetails LDAPconfiguration;
 
     private ILDAP LDAPstub;
 
@@ -42,8 +42,15 @@ public abstract class Dispatcher {
 
         this.configuration = configuration;
 
+        try {
+            LDAPconfiguration = Parser.loadLDAPDetails();
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
+            return;
+        }
+
         // get LDAP stub and register Dispatcher with LDAP
-        LDAPstub = (ILDAP) loadLDAPInterface(Constants.HOSTNAME, "LDAP");
+        LDAPstub = (ILDAP) loadLDAPInterface(LDAPconfiguration.host, "LDAP");
         try {
             LDAPstub.registerDispatcher(configuration.credentials);
         } catch (RemoteException e) {

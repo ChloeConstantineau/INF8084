@@ -1,9 +1,9 @@
 package ca.polymtl.inf8480.tp2.server;
 
+import ca.polymtl.inf8480.tp2.shared.ServerDetails;
 import ca.polymtl.inf8480.tp2.shared.*;
 import ca.polymtl.inf8480.tp2.shared.exception.*;
 
-import java.awt.*;
 import java.io.IOException;
 import java.rmi.ConnectException;
 import java.rmi.NotBoundException;
@@ -19,6 +19,7 @@ public class OperationServer implements IOperationServer {
     private String uniqueName = "";
     private OperationServerConfiguration configuration;
     private ILDAP LDAPStub;
+    private ServerDetails LDAPconfiguration;
 
     public static void main(String[] args) {
         int serverId = Integer.parseInt(args[0]);
@@ -40,7 +41,7 @@ public class OperationServer implements IOperationServer {
 
     public OperationServer(int serverId) throws IOException {
         loadConfiguration(serverId);
-        LDAPStub = (ILDAP) loadLDAPInterface(Constants.HOSTNAME, "LDAP");
+        LDAPStub = (ILDAP) loadLDAPInterface(LDAPconfiguration.host, "LDAP");
     }
 
     private ILDAP loadLDAPInterface(String hostname, String registryName) {
@@ -63,6 +64,9 @@ public class OperationServer implements IOperationServer {
         this.configuration =
                 Parser.<OperationServerConfiguration>parseJson(String.format(Constants.DEFAULT_OPERATION_SERVER_CONFIGS +
                         "server_%d.json", id), OperationServerConfiguration.class);
+
+        System.out.println("Breaking here?");
+        LDAPconfiguration = Parser.loadLDAPDetails();
     }
 
     public void run() {
@@ -75,8 +79,7 @@ public class OperationServer implements IOperationServer {
 
         IOperationServer stub = null;
         try {
-            stub = (IOperationServer) UnicastRemoteObject
-                    .exportObject(this, this.configuration.port);
+            stub = (IOperationServer) UnicastRemoteObject.exportObject(this, this.configuration.port);
 
             Registry registry = LocateRegistry.getRegistry(configuration.host, Constants.RMI_REGISTRY_PORT);
 
@@ -127,12 +130,15 @@ public class OperationServer implements IOperationServer {
 
     @Override
     public TaskResult execute(Credentials credentials, Task task) throws RemoteException {
-        // check if dispatcher is valid
-        try{
-            if(!LDAPStub.authenticateDispatcher(credentials))
-               return null;
-        } catch(RemoteException e){
-           print(e.getMessage());
+        // check if dispatcher is valid 10% of the time
+        float value = new Random().nextFloat();
+        if(value <= 0.1){
+            try{
+                if(!LDAPStub.authenticateDispatcher(credentials))
+                    return null;
+            } catch(RemoteException e){
+                print(e.getMessage());
+            }
         }
 
         // check if server accepts task

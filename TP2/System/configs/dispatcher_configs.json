@@ -4,7 +4,7 @@
     "password": "123"
   },
   "secureMode" : true,
-  "fileName" : "operations-588.txt",
+  "fileName" : "operations-1481.txt",
   "availableServers" :
   [
     {
@@ -14,6 +14,10 @@
     {
       "host" : "127.0.0.1",
       "port" : "5012"
+    },
+    {
+      "host" : "127.0.0.1",
+      "port" : "5013"
     }
   ],
   "capacityUpperFactor" : 0
