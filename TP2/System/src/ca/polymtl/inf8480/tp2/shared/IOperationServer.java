@@ -6,10 +6,10 @@ import java.rmi.Remote;
 import java.rmi.RemoteException;
 
 public interface IOperationServer extends Remote {
-    int getCapacity();
-    int getId();
+
+    int getCapacity() throws RemoteException;
 
     String ping() throws RemoteException;
 
-    TaskResult execute(Credentials credentials, Task task) throws OverloadingServerException;
+    TaskResult execute(Credentials credentials, Task task) throws OverloadingServerException, RemoteException;
 }

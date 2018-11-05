@@ -86,11 +86,6 @@ public class OperationServer implements IOperationServer {
     }
 
     @Override
-    public int getId() {
-        return this.configuration.port;
-    }
-
-    @Override
     public String ping() {
         return "Pong!";
     }
@@ -117,6 +112,7 @@ public class OperationServer implements IOperationServer {
     @Override
     public TaskResult execute(Credentials credentials, Task task) throws OverloadingServerException {
         // check if user is valid
+        System.out.println("Gets here..");
         try{
             if(!this.LDAPStub.authenticateDispatcher(credentials))
                 return null;

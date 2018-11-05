@@ -1,6 +1,7 @@
 package ca.polymtl.inf8480.tp2.dispatcher;
 
 import ca.polymtl.inf8480.tp2.shared.*;
+import ca.polymtl.inf8480.tp2.shared.Operation;
 
 import java.io.IOException;
 import java.rmi.NotBoundException;
@@ -9,7 +10,6 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;

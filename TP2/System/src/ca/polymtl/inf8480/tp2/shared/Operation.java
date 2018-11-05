@@ -1,6 +1,8 @@
 package ca.polymtl.inf8480.tp2.shared;
 
-public class Operation {
+import java.io.Serializable;
+
+public class Operation implements Serializable{
     public OperationType type;
     public int value;
 

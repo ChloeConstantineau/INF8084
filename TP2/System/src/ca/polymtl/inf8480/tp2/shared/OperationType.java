@@ -1,6 +1,8 @@
 package ca.polymtl.inf8480.tp2.shared;
 
-public enum OperationType {
+import java.io.Serializable;
+
+public enum OperationType implements Serializable{
     Pell {
         public String toString() {
             return "pell";
