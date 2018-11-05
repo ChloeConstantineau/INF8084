@@ -25,7 +25,8 @@ public class LDAP implements ILDAP {
     public LDAP() {
         super();
         try{
-            this.configs = Parser.loadLDAPDetails();
+            ServerDetails config = Parser.loadLDAPDetails();
+            configs = new ServerDetails(config.host, config.port);
 
         }catch(IOException e){
             System.out.println("Unable to load LDAP config details");
@@ -43,10 +44,9 @@ public class LDAP implements ILDAP {
         }
 
         try {
-            ILDAP stub = (ILDAP) UnicastRemoteObject
-                    .exportObject(this, Constants.LDAP_PORT);
+            ILDAP stub = (ILDAP) UnicastRemoteObject.exportObject(this, Constants.LDAP_PORT);
 
-            Registry registry = LocateRegistry.getRegistry();
+            Registry registry = LocateRegistry.getRegistry(configs.host, Constants.RMI_REGISTRY_PORT);
             registry.rebind("LDAP", stub);
             System.out.println("LDAP server ready.");
         } catch (ConnectException e) {
