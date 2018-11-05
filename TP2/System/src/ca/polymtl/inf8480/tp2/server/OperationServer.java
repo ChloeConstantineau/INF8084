@@ -110,20 +110,22 @@ public class OperationServer implements IOperationServer {
     }
 
     @Override
-    public TaskResult execute(Credentials credentials, Task task) throws OverloadingServerException {
+    public TaskResult execute(Credentials credentials, Task task) throws RemoteException {
         // check if user is valid
+        //try{
+        //    if(!this.LDAPStub.authenticateDispatcher(credentials))
+        //       return null;
+        //}catch(RemoteException e){
+        //   print(e.getMessage());
+        //}
+
         System.out.println("Gets here..");
-        try{
-            if(!this.LDAPStub.authenticateDispatcher(credentials))
-                return null;
-        }catch(RemoteException e){
-            print(e.getMessage());
-        }
 
         // check if server accepts task
         if (!accept(task.operations.size())) {
             return TaskResult.of(0, new OverloadingServerException());
         }
+        System.out.println("Gets here..2");
 
         // Check if server is evil
         return isTrustworthy() ? trustedResponse(task) : untrustedResponse();

@@ -28,10 +28,9 @@ public class SecureDispatcher extends Dispatcher {
                 }catch(RemoteException e){
                     System.out.println("Unable to retrieve server capacity");
                 }
-                System.out.println("Server capacity: 4");
+                System.out.println("Server capacity: " + capacity);
                 while (this.pendingOperations.peek() != null) {
                     List<Operation> toDo = new ArrayList<>();
-
                     for (int i = 0; i < capacity && this.pendingOperations.peek() != null; i++) {
                         Operation op = this.pendingOperations.poll();
                         toDo.add(op);
