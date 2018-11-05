@@ -10,7 +10,6 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -23,12 +22,13 @@ import java.nio.file.Paths;
 public abstract class Dispatcher {
 
     protected DispatcherConfiguration configuration = null;
-    protected ConcurrentLinkedQueue<Operation> pendingOperations = new ConcurrentLinkedQueue<Operation>();
-    protected ConcurrentLinkedQueue<TaskResult> taskResults = new ConcurrentLinkedQueue<TaskResult>();
+    protected ConcurrentLinkedQueue<Operation> pendingOperations = new ConcurrentLinkedQueue<>();
+    protected ConcurrentLinkedQueue<TaskResult> taskResults = new ConcurrentLinkedQueue<>();
     protected int nbOperations = 0;
-    protected ConcurrentHashMap<Integer, IOperationServer> operationServers = new ConcurrentHashMap<Integer, IOperationServer>();
-    protected List<Integer> operationServerIds = new ArrayList<>();
+    protected ConcurrentHashMap<String, IOperationServer> operationServers = new ConcurrentHashMap<>();
+    protected List<String> operationServerIds = new ArrayList<>();
     protected int finalResult = 0;
+    protected int averageCapacity = 0;
 
     public Dispatcher() {
     }
@@ -56,7 +56,7 @@ public abstract class Dispatcher {
         }
     }
 
-    private final void loadOperationStubs() {  //TODO : change for LDAP list
+    private final void loadOperationStubs() {
         if (this.configuration == null) {
             return;
         }
@@ -66,10 +66,12 @@ public abstract class Dispatcher {
         for (ServerDetails serverConfig : this.configuration.availableServers) {
             IOperationServer stub = this.loadServerStub(serverConfig);
             if (stub != null) {
-                this.operationServers.put(serverConfig.port, stub);
-                this.operationServerIds.add(serverConfig.port);
+                String specificName = String.format("server_%d_%d", serverConfig.host, serverConfig.port);
+                this.operationServers.put(specificName, stub);
+                this.operationServerIds.add(specificName);
             }
         }
+        averageCapacity = averageCapacity / this.operationServers.size();
     }
 
     private IOperationServer loadServerStub(ServerDetails config) {
@@ -81,8 +83,9 @@ public abstract class Dispatcher {
 
         try {
             Registry registry = LocateRegistry.getRegistry(config.host, Constants.RMI_REGISTRY_PORT);
-            String specificName = String.format("server_%d", config.port);
+            String specificName = String.format("server_%d_%d", config.host, config.port);
             stub = (IOperationServer) registry.lookup(specificName);
+            averageCapacity += stub.getCapacity();
         } catch (RemoteException e) {
             System.out.println("Error: the given name '" + e.getMessage()
                     + "' is not defined in the registry");
@@ -131,21 +134,20 @@ public abstract class Dispatcher {
         }
     }
 
-    protected void makeTaskEasier(){
+    protected void makeTaskEasier() {
         this.configuration.capacityFactor = this.configuration.capacityFactor > 0 ?
-                this.configuration.capacityFactor-- :  this.configuration.capacityFactor;
+                this.configuration.capacityFactor-- : this.configuration.capacityFactor;
     }
 
-    protected void populatePendingOperations(List<Operation> operations){
-        for (Operation op: operations) {
+    protected void populatePendingOperations(List<Operation> operations) {
+        for (Operation op : operations) {
             this.pendingOperations.add(op);
         }
     }
 
-    protected void setFinalResult(){
+    protected void setFinalResult() {
 
-        for (TaskResult result : this.taskResults)
-        {
+        for (TaskResult result : this.taskResults) {
             finalResult += result.result;
         }
 

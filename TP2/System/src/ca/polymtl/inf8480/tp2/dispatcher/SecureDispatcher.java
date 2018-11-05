@@ -20,7 +20,7 @@ public class SecureDispatcher extends Dispatcher {
     public void dispatch() {
         ExecutorService executor = Executors.newFixedThreadPool(this.operationServers.size());
 
-        for (int calculationServerId : this.operationServerIds) {
+        for (String calculationServerId : this.operationServerIds) {
             IOperationServer stub = this.operationServers.get(calculationServerId);
             if (stub != null) {
                 executor.execute(() -> {
@@ -51,12 +51,10 @@ public class SecureDispatcher extends Dispatcher {
                                 } else if (tResult.hadFailure instanceof OverloadingServerException) {
                                     this.makeTaskEasier();
                                     this.populatePendingOperations(toDo);
-                                } else if (tResult.hadFailure instanceof RemoteException) {
-                                    this.populatePendingOperations(toDo);
-                                    break;
                                 }
                             } catch (RemoteException e) {
                                 System.out.println(e.getMessage());
+                                this.populatePendingOperations(toDo);
                                 break;
                             }
                         }

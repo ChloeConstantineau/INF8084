@@ -3,7 +3,6 @@ package ca.polymtl.inf8480.tp2.server;
 import ca.polymtl.inf8480.tp2.shared.*;
 import ca.polymtl.inf8480.tp2.shared.exception.*;
 
-import java.awt.*;
 import java.io.IOException;
 import java.rmi.ConnectException;
 import java.rmi.RemoteException;
@@ -66,7 +65,7 @@ public class OperationServer implements IOperationServer {
 
             Registry registry = LocateRegistry.getRegistry(configuration.host, Constants.RMI_REGISTRY_PORT);
 
-            String specificName = String.format("server_%d", this.configuration.port);
+            String specificName = String.format("server_%d_%d", this.configuration.host, this.configuration.port);
             registry.rebind(specificName, stub);
             System.out.println("OperationServer" + specificName + " ready.");
         } catch (ConnectException e) {
