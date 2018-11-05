@@ -28,7 +28,7 @@ public class SecureDispatcher extends Dispatcher {
                 }catch(RemoteException e){
                     System.out.println("Unable to retrieve server capacity");
                 }
-                System.out.println("Server capacity: " + capacity);
+
                 while (this.pendingOperations.peek() != null) {
                     List<Operation> toDo = new ArrayList<>();
                     for (int i = 0; i < capacity && this.pendingOperations.peek() != null; i++) {
@@ -58,5 +58,17 @@ public class SecureDispatcher extends Dispatcher {
         executor.shutdown();
         while (!executor.isTerminated()) {
         }
+
+        this.setFinalResult();
+    }
+
+    private void setFinalResult(){
+
+        for (TaskResult result : this.taskResults)
+        {
+            finalResult += result.result;
+        }
+
+        System.out.println(finalResult);
     }
 }

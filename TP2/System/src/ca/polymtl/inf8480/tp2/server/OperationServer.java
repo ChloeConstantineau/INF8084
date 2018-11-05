@@ -3,6 +3,7 @@ package ca.polymtl.inf8480.tp2.server;
 import ca.polymtl.inf8480.tp2.shared.*;
 import ca.polymtl.inf8480.tp2.shared.exception.*;
 
+import java.awt.*;
 import java.io.IOException;
 import java.rmi.ConnectException;
 import java.rmi.RemoteException;
@@ -119,13 +120,10 @@ public class OperationServer implements IOperationServer {
         //   print(e.getMessage());
         //}
 
-        System.out.println("Gets here..");
-
         // check if server accepts task
         if (!accept(task.operations.size())) {
             return TaskResult.of(0, new OverloadingServerException());
         }
-        System.out.println("Gets here..2");
 
         // Check if server is evil
         return isTrustworthy() ? trustedResponse(task) : untrustedResponse();
@@ -133,6 +131,7 @@ public class OperationServer implements IOperationServer {
 
     private TaskResult trustedResponse(Task task) {
         int result = getResult(task);
+        System.out.println(result);
         return TaskResult.of(result, null);
     }
 
@@ -155,6 +154,7 @@ public class OperationServer implements IOperationServer {
 
     private TaskResult untrustedResponse() {
         int fakeValue = new Random().nextInt(Integer.MAX_VALUE);
+        System.out.println("FAKE: " + fakeValue);
         return TaskResult.of(fakeValue, null);
     }
 

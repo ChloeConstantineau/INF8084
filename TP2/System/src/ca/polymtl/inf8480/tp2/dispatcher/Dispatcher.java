@@ -26,6 +26,7 @@ public abstract class Dispatcher {
     protected ConcurrentLinkedQueue<TaskResult> taskResults = new ConcurrentLinkedQueue<TaskResult>();
     protected int nbOperations = 0;
     protected HashMap<Integer, IOperationServer> operationServers = new HashMap<Integer, IOperationServer>();
+    protected int finalResult = 0;
 
     public Dispatcher() {
     }
