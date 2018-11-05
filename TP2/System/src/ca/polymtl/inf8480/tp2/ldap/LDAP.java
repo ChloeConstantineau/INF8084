@@ -3,6 +3,7 @@ package ca.polymtl.inf8480.tp2.ldap;
 import ca.polymtl.inf8480.tp2.shared.*;
 import ca.polymtl.inf8480.tp2.shared.exception.*;
 
+import java.io.IOException;
 import java.rmi.ConnectException;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
@@ -19,9 +20,16 @@ public class LDAP implements ILDAP {
 
     ConcurrentLinkedQueue<String> operationServerRegistry = new ConcurrentLinkedQueue<>();
     ConcurrentHashMap<String, Credentials> dispatcherRegistry = new ConcurrentHashMap<>();
+    ServerDetails configs;
 
     public LDAP() {
         super();
+        try{
+            this.configs = Parser.loadLDAPDetails();
+
+        }catch(IOException e){
+            System.out.println("Unable to load LDAP config details");
+        }
     }
 
     public static void main(String[] args) {

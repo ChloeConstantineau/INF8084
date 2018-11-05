@@ -8,6 +8,7 @@ import ca.polymtl.inf8480.tp2.shared.exception.OverloadingServerException;
 
 import java.rmi.RemoteException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -21,7 +22,15 @@ public class UnsecureDispatcher extends Dispatcher {
             return;
         }
 
+        HashMap<String, TaskResult> taskResultsPerServer = new HashMap<>();
+
         while (this.operationServers.size() > 1 && this.pendingOperations.peek() != null) {
+
+            List<Operation> toDo = new ArrayList<>();
+            for (int i = 0; i < averageCapacity + this.configuration.capacityFactor && this.pendingOperations.peek() != null; i++) {
+                Operation op = this.pendingOperations.poll();
+                toDo.add(op);
+            }
 
             ExecutorService executor = Executors.newFixedThreadPool(this.operationServers.size());
 
@@ -29,39 +38,22 @@ public class UnsecureDispatcher extends Dispatcher {
                 IOperationServer stub = this.operationServers.get(calculationServerId);
                 if (stub != null) {
                     executor.execute(() -> {
-                        int capacity = this.averageCapacity;
-                        try {
-                            capacity = stub.getCapacity();
-                            capacity += this.configuration.capacityFactor;
-                        } catch (RemoteException e) {
-                            System.out.println("Unable to retrieve server specific capacity.");
-                        }
+                        if (!toDo.isEmpty()) {
 
-                        while (this.pendingOperations.peek() != null) {
-                            List<Operation> toDo = new ArrayList<>();
-                            for (int i = 0; i < capacity && this.pendingOperations.peek() != null; i++) {
-                                Operation op = this.pendingOperations.poll();
-                                toDo.add(op);
-                            }
+                            Task task = new Task(toDo);
 
-                            if (!toDo.isEmpty()) {
+                            try {
+                                TaskResult tResult = stub.execute(this.configuration.credentials, task);
 
-                                Task task = new Task(toDo);
-
-                                try {
-                                    TaskResult tResult = stub.execute(this.configuration.credentials, task);
-
-                                    if (tResult.hadFailure == null) {
-                                        this.taskResults.add(tResult);
-                                    } else if (tResult.hadFailure instanceof OverloadingServerException) {
-                                        this.makeTaskEasier();
-                                        this.populatePendingOperations(toDo);
-                                    }
-                                } catch (RemoteException e) {
-                                    System.out.println(e.getMessage());
+                                if (tResult.hadFailure == null) {
+                                    this.taskResults.add(tResult);
+                                } else if (tResult.hadFailure instanceof OverloadingServerException) {
+                                    this.makeTaskEasier();
                                     this.populatePendingOperations(toDo);
-                                    break;
                                 }
+                            } catch (RemoteException e) {
+                                System.out.println(e.getMessage());
+                                this.populatePendingOperations(toDo);
                             }
                         }
                     });
@@ -71,11 +63,7 @@ public class UnsecureDispatcher extends Dispatcher {
             executor.shutdown();
             while (!executor.isTerminated()) {
             }
-
-
         }
-
-
         this.setFinalResult();
     }
 }
