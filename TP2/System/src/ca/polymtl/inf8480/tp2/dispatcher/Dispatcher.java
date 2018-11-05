@@ -4,25 +4,29 @@ import ca.polymtl.inf8480.tp2.server.OperationServerConfiguration;
 import ca.polymtl.inf8480.tp2.shared.*;
 import ca.polymtl.inf8480.tp2.shared.Constants;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
+
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
+
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
 public abstract class Dispatcher {
 
     protected DispatcherConfiguration configuration = null;
-    protected ConcurrentLinkedQueue<Operation> pendingOperations = new ConcurrentLinkedQueue<>();
+    protected ConcurrentLinkedQueue<Operation> pendingOperations = new ConcurrentLinkedQueue<Operation>();;
     protected int nbOperations = 0;
-    protected HashMap<Integer, IOperationServer> operationServers = new HashMap<>();
+    protected HashMap<Integer, IOperationServer> operationServers = new HashMap<Integer, IOperationServer>();;
 
     public Dispatcher() {
     }
@@ -86,30 +90,44 @@ public abstract class Dispatcher {
     }
 
     private final void loadOperationsFromFile(String fileLocation) {
+        System.out.println("starting..");
+        Path filePath = Paths.get(fileLocation);
+
+		if (!Files.exists(filePath)) {
+			System.out.println("Could not find operations file... ");
+            return;
+		}     
+
         try {
-            File file = new File(fileLocation);
-            BufferedReader br = new BufferedReader(new FileReader(file));
 
-            String str;
-            while ((str = br.readLine()) != null) {
-                List<String> line = Arrays.asList(str.split(" "));
+            Charset cs = Charset.forName("utf-8");
+            List<String> instructions = Files.readAllLines(filePath, cs);
 
-                if (line.size() != 2) {
-                    throw new IOException();
+            for (String instruction : instructions) {
+                String[] instructionElements = instruction.split(" ");
+                if (instructionElements.length != 2) {
+                    continue;
                 }
-
-                String fct = line.get(0);
-                int value = Integer.parseInt(line.get(1));
-
-                if (fct == OperationType.Pell.toString() || fct == OperationType.Prime.toString())
-                    pendingOperations.add(Operation.of(OperationType.Pell, value));
-
-                if (!pendingOperations.isEmpty())
-                    nbOperations = pendingOperations.size();
+                
+                String fct = instructionElements[0];
+                int value = Integer.parseInt(instructionElements[1]);
+                
+                
+                
+                if (fct.equals(OperationType.Pell.toString())){
+                    this.pendingOperations.add(Operation.of(OperationType.Pell, value));
+                }
+                else if (fct.equals(OperationType.Prime.toString())){
+                    this.pendingOperations.add(Operation.of(OperationType.Prime, value)); 
+                }       
             }
 
-        } catch (IOException ioe) {
-            System.out.println("Unable to read operations' file...");
+        } catch (IOException e) {
+            System.out.println("Unable to read from file..");
+        }
+
+		if (this.pendingOperations != null) {
+			this.nbOperations = this.pendingOperations.size();
         }
     }
 

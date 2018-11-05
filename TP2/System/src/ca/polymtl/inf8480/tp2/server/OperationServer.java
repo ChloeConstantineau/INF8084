@@ -17,12 +17,8 @@ public class OperationServer implements IOperationServer {
     private OperationServerConfiguration configuration;
 
     public static void main(String[] args) {
-        Scanner reader = new Scanner(System.in);
-        System.out.println(Constants.USER_MENU_OPERATION_SERVER);
-        int serverId = reader.nextInt();
-        reader.close();
-
-        if (serverId < 1 || serverId > 4) {
+        int serverId = Integer.parseInt(args[0]);
+        if (args.length != 1 || serverId < 1 || serverId > 4) {
             System.out.println("Selection not handled.. Shutting down.");
             return;
         }
