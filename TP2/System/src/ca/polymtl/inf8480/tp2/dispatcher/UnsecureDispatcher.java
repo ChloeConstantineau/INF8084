@@ -5,7 +5,7 @@ import java.rmi.RemoteException;
 public class UnsecureDispatcher extends Dispatcher {
 
     @Override
-    public void process() {
+    public void dispatch() {
         this.operationServers.forEach((k, v) -> {
             try {
                 String response = v.ping();

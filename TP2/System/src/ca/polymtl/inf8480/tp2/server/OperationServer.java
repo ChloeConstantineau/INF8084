@@ -5,6 +5,7 @@ import ca.polymtl.inf8480.tp2.shared.exception.*;
 
 import java.io.IOException;
 import java.rmi.ConnectException;
+import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 
 import java.rmi.registry.Registry;
@@ -14,6 +15,7 @@ import java.util.Random;
 public class OperationServer implements IOperationServer {
 
     private OperationServerConfiguration configuration;
+    private ILDAP LDAPStub;
 
     public static void main(String[] args) {
         int serverId = Integer.parseInt(args[0]);
@@ -35,12 +37,17 @@ public class OperationServer implements IOperationServer {
 
     public OperationServer(int serverId) throws IOException {
         loadConfiguration(serverId);
+        loadLDAPStub();
     }
 
     private void loadConfiguration(int id) throws IOException {
         this.configuration =
                 Parser.<OperationServerConfiguration>parseJson(String.format(Constants.DEFAULT_OPERATION_SERVER_CONFIGS +
                         "server_%d.json", id), OperationServerConfiguration.class);
+    }
+
+    private void loadLDAPStub(){
+
     }
 
     public void run() {
@@ -74,6 +81,16 @@ public class OperationServer implements IOperationServer {
     }
 
     @Override
+    public int getCapacity() {
+        return this.configuration.C;
+    }
+
+    @Override
+    public int getId() {
+        return this.configuration.port;
+    }
+
+    @Override
     public String ping() {
         return "Pong!";
     }
@@ -98,22 +115,27 @@ public class OperationServer implements IOperationServer {
     }
 
     @Override
-    public TaskResponse execute(Credentials credentials, Task task) throws OverloadingServerException {
+    public TaskResult execute(Credentials credentials, Task task) throws OverloadingServerException {
         // check if user is valid
-        // ask LDAP.authentify(Credentials)
+        try{
+            if(!this.LDAPStub.authenticateDispatcher(credentials))
+                return null;
+        }catch(RemoteException e){
+            print(e.getMessage());
+        }
 
         // check if server accepts task
         if (!accept(task.operations.size())) {
-            throw new OverloadingServerException();
+            return TaskResult.of(0, new OverloadingServerException());
         }
 
         // Check if server is evil
         return isTrustworthy() ? trustedResponse(task) : untrustedResponse();
     }
 
-    private TaskResponse trustedResponse(Task task) {
+    private TaskResult trustedResponse(Task task) {
         int result = getResult(task);
-        return TaskResponse.of(result, ConsoleOutput.RIGHT_RESULT.toString());
+        return TaskResult.of(result, null);
     }
 
     private int getResult(Task task) {
@@ -133,9 +155,9 @@ public class OperationServer implements IOperationServer {
         return result;
     }
 
-    private TaskResponse untrustedResponse() {
+    private TaskResult untrustedResponse() {
         int fakeValue = new Random().nextInt(Integer.MAX_VALUE);
-        return TaskResponse.of(fakeValue, ConsoleOutput.WRONG_RESULT.toString());
+        return TaskResult.of(fakeValue, null);
     }
 
     private static void print(String s) {

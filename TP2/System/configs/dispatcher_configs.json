@@ -1,4 +1,8 @@
 {
+  "credentials" : {
+    "username": "abc",
+    "password": "123"
+  },
   "secureMode" : true,
   "fileName" : "operations-588.txt",
   "availableServers" :

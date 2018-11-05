@@ -9,6 +9,7 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -22,6 +23,7 @@ public abstract class Dispatcher {
 
     protected DispatcherConfiguration configuration = null;
     protected ConcurrentLinkedQueue<Operation> pendingOperations = new ConcurrentLinkedQueue<Operation>();
+    protected ConcurrentLinkedQueue<TaskResult> taskResults = new ConcurrentLinkedQueue<TaskResult>();
     protected int nbOperations = 0;
     protected HashMap<Integer, IOperationServer> operationServers = new HashMap<Integer, IOperationServer>();
 
@@ -51,7 +53,7 @@ public abstract class Dispatcher {
         }
     }
 
-    private final void loadOperationStubs() {
+    private final void loadOperationStubs() {  //TODO : change for LDAP list
         if (this.configuration == null) {
             return;
         }
@@ -126,5 +128,5 @@ public abstract class Dispatcher {
     }
 
     //To be overridden
-    public abstract void process();
+    public abstract void dispatch();
 }

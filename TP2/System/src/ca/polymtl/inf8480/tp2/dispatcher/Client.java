@@ -31,7 +31,7 @@ public class Client {
         }
 
         long start = System.nanoTime();
-        dispatcher.process();
+        dispatcher.dispatch();
         long elapsedTime = System.nanoTime() - start;
         System.out.println("Elapsed time: " + elapsedTime / 1000000 + " ms");
     }
