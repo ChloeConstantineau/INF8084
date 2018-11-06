@@ -77,7 +77,7 @@ public class OperationServer implements IOperationServer {
 
             Registry registry = LocateRegistry.getRegistry(LDAPconfiguration.host, Constants.RMI_REGISTRY_PORT);
 
-            uniqueName = String.format("server_%d", this.configuration.port);
+            uniqueName = "server_" + configuration.host + "_" + configuration.port;
             registry.rebind(uniqueName, stub);
             System.out.println("OperationServer" + uniqueName + " ready.");
 

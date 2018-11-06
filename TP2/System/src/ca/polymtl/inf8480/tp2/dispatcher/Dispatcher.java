@@ -94,8 +94,9 @@ public abstract class Dispatcher {
 
         for (ServerDetails serverConfig : this.configuration.availableServers) {
             IOperationServer stub = this.loadServerStub(serverConfig);
+            System.out.println("Getting there");
             if (stub != null) {
-                String specificName = String.format("server_%d_%d", serverConfig.host, serverConfig.port);
+                String specificName = "server_" + serverConfig.host + "_" + serverConfig.port;
                 this.operationServers.put(specificName, stub);
                 this.operationServerIds.add(specificName);
             }
@@ -107,12 +108,12 @@ public abstract class Dispatcher {
         if (System.getSecurityManager() == null) {
             System.setSecurityManager(new SecurityManager());
         }
-
+        System.out.println("Passed secu");
         IOperationServer stub = null;
 
         try {
             Registry registry = LocateRegistry.getRegistry(LDAPconfiguration.host, Constants.RMI_REGISTRY_PORT);
-            String specificName = String.format("server_%d_%d", config.host, config.port);
+            String specificName = "server_" + config.host + "_" + config.port;
             stub = (IOperationServer) registry.lookup(specificName);
             averageCapacity += stub.getCapacity();
         } catch (RemoteException e) {
