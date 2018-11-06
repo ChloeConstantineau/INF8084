@@ -11,35 +11,46 @@ import java.rmi.RemoteException;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class SecureDispatcher extends Dispatcher {
 
+    public ConcurrentHashMap<String, Integer> overloadCount = new ConcurrentHashMap<>();
+
     @Override
     public void dispatch() {
-		System.out.println("Dispatching Starting..");
+        System.out.println("Dispatching Starting..");
+
+
         ExecutorService executor = Executors.newFixedThreadPool(this.operationServers.size());
 
         for (String calculationServerId : this.operationServerIds) {
             IOperationServer stub = this.operationServers.get(calculationServerId);
             if (stub != null) {
-                executor.execute(() -> {   
-                    while (this.pendingOperations.peek() != null) {						
-						System.out.println(this.pendingOperations.size());
-						int capacity = 0;
-                    try {
-                        capacity = stub.getCapacity();
-                        
-                    } catch (RemoteException e) {
-                        System.out.println("Unable to retrieve server capacity.");
-                    }
-						capacity += this.configuration.capacityFactor;
-                        System.out.println(capacity + " CAPACITY");
+
+                int serverCapacity = 0;
+                try {
+                    serverCapacity = stub.getCapacity();
+
+                } catch (RemoteException e) {
+                    System.out.println("Unable to retrieve server capacity.");
+                }
+
+                final int capacityAndFactor = serverCapacity + this.configuration.capacityFactor;
+
+                executor.execute(() -> {
+                    while (this.pendingOperations.peek() != null) {
+                        System.out.println(this.pendingOperations.size());
+
+                        int C = capacityAndFactor - this.overloadCount.get(calculationServerId);
+                        System.out.println(C + " CAPACITY");
+
                         List<Operation> toDo = new ArrayList<>();
-                        for (int i = 0; i < capacity && this.pendingOperations.peek() != null; i++) {
+                        for (int i = 0; i < C && this.pendingOperations.peek() != null; i++) {
                             Operation op = this.pendingOperations.poll();
-                            toDo.add(op);                            
+                            toDo.add(op);
                         }
 
                         if (!toDo.isEmpty()) {
@@ -47,17 +58,17 @@ public class SecureDispatcher extends Dispatcher {
                                 TaskResult tResult = stub.execute(this.configuration.credentials, new Task(toDo));
                                 this.taskResults.add(tResult);
                                 if (tResult.hadFailure instanceof OverloadingServerException) {
-									System.out.println("OVERLOADED ERROR");
-                                    this.makeTaskEasier();
+                                    System.out.println("OVERLOADED ERROR");
+                                    this.incrementOverloadCount(calculationServerId);
                                     for (Operation op : toDo) {
-										this.pendingOperations.add(op);
-									}
+                                        this.pendingOperations.add(op);
+                                    }
                                 }
                             } catch (RemoteException e) {
                                 System.out.println(e.getMessage());
                                 for (Operation op : toDo) {
-										this.pendingOperations.add(op);
-								}
+                                    this.pendingOperations.add(op);
+                                }
                                 break;
                             }
                         }
@@ -71,5 +82,12 @@ public class SecureDispatcher extends Dispatcher {
         }
 
         this.setFinalResult();
+    }
+
+    private void incrementOverloadCount(String serverId) {
+        if (!this.overloadCount.containsKey(serverId))
+            this.overloadCount.put(serverId, 1);
+        else
+            this.overloadCount.computeIfPresent(serverId, (tokenKey, oldValue) -> oldValue++);
     }
 }
