@@ -23,11 +23,11 @@ public class LDAP implements ILDAP {
     ServerDetails configs;
 
     public LDAP() {
-        try{
+        try {
             ServerDetails config = Parser.loadLDAPDetails();
             configs = new ServerDetails(config.host, config.port);
 
-        }catch(IOException e){
+        } catch (IOException e) {
             System.out.println("Unable to load LDAP config details");
         }
     }
@@ -98,8 +98,9 @@ public class LDAP implements ILDAP {
     public void registerOperationServer(String hostname) throws RemoteException {
         System.out.println("Registering Operation Server");
         try {
-            if (operationServerRegistry.contains(hostname))
+            if (operationServerRegistry.contains(hostname) && !ping(hostname)) {
                 throw new ServerRegistrationException();
+            }
             operationServerRegistry.add(hostname);
         } catch (NullPointerException e) {
             System.out.println(e.getMessage());
