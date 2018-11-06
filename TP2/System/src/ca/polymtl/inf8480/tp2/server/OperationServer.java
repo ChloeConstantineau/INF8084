@@ -40,27 +40,23 @@ public class OperationServer implements IOperationServer {
     }
 
     public OperationServer(int serverId) throws IOException {
-        loadConfiguration(serverId);
-        LDAPStub = (ILDAP) loadLDAPInterface(LDAPconfiguration.host, "LDAP");
+        loadConfigurations(serverId);
+        loadLDAPStub(LDAPconfiguration.host);
     }
 
-    private ILDAP loadLDAPInterface(String hostname, String registryName) {
-        ILDAP stub = null;
-
+    private void loadLDAPStub(String hostname) {
         System.out.println("Loading LDAP stub");
         try {
             Registry registry = LocateRegistry.getRegistry(hostname);
-            stub = (ILDAP) registry.lookup(registryName);
+            LDAPStub = (ILDAP) registry.lookup("LDAP");
         } catch (NotBoundException e) {
-            System.out.println(ConsoleOutput.REGISTRY_NOT_FOUND.toString() + " : " + registryName);
+            System.out.println(ConsoleOutput.REGISTRY_NOT_FOUND.toString() + " : " + "LDAP");
         } catch (RemoteException e) {
             System.out.println("Error: " + e.getMessage());
         }
-
-        return stub;
     }
 
-    private void loadConfiguration(int id) throws IOException {
+    private void loadConfigurations(int id) throws IOException {
         this.configuration =
                 Parser.<OperationServerConfiguration>parseJson(String.format(Constants.DEFAULT_OPERATION_SERVER_CONFIGS +
                         "server_%d.json", id), OperationServerConfiguration.class);
@@ -132,11 +128,11 @@ public class OperationServer implements IOperationServer {
     public TaskResult execute(Credentials credentials, Task task) throws RemoteException {
         // check if dispatcher is valid 10% of the time
         float value = new Random().nextFloat();
-        if(value <= 0.1){
-            try{
-                if(!LDAPStub.authenticateDispatcher(credentials))
+        if (value <= 0.1) {
+            try {
+                if (!LDAPStub.authenticateDispatcher(credentials))
                     return null;
-            } catch(RemoteException e){
+            } catch (RemoteException e) {
                 print(e.getMessage());
             }
         }
