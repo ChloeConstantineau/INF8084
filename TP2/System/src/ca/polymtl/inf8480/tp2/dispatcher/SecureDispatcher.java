@@ -18,25 +18,28 @@ public class SecureDispatcher extends Dispatcher {
 
     @Override
     public void dispatch() {
+		System.out.println("Dispatching Starting..");
         ExecutorService executor = Executors.newFixedThreadPool(this.operationServers.size());
 
         for (String calculationServerId : this.operationServerIds) {
             IOperationServer stub = this.operationServers.get(calculationServerId);
             if (stub != null) {
-                executor.execute(() -> {
-                    int capacity = 0;
+                executor.execute(() -> {   
+                    while (this.pendingOperations.peek() != null) {						
+						
+						int capacity = 0;
                     try {
                         capacity = stub.getCapacity();
-                        capacity += this.configuration.capacityFactor;
+                        
                     } catch (RemoteException e) {
                         System.out.println("Unable to retrieve server capacity.");
                     }
-
-                    while (this.pendingOperations.peek() != null) {
+						capacity += this.configuration.capacityFactor;
+                        System.out.println(capacity + " CAPACITY");
                         List<Operation> toDo = new ArrayList<>();
                         for (int i = 0; i < capacity && this.pendingOperations.peek() != null; i++) {
                             Operation op = this.pendingOperations.poll();
-                            toDo.add(op);
+                            toDo.add(op);                            
                         }
 
                         if (!toDo.isEmpty()) {
@@ -49,6 +52,7 @@ public class SecureDispatcher extends Dispatcher {
                                 if (tResult.hadFailure == null) {
                                     this.taskResults.add(tResult);
                                 } else if (tResult.hadFailure instanceof OverloadingServerException) {
+									System.out.println("OVERLOADED ERROR");
                                     this.makeTaskEasier();
                                     this.populatePendingOperations(toDo);
                                 }

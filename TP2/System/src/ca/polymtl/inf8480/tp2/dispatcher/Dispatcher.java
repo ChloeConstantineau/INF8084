@@ -108,7 +108,6 @@ public abstract class Dispatcher {
         if (System.getSecurityManager() == null) {
             System.setSecurityManager(new SecurityManager());
         }
-        System.out.println("Passed secu");
         IOperationServer stub = null;
 
         try {
@@ -165,8 +164,8 @@ public abstract class Dispatcher {
     }
 
     protected void makeTaskEasier() {
-        this.configuration.capacityFactor = this.configuration.capacityFactor > 0 ?
-                this.configuration.capacityFactor-- : this.configuration.capacityFactor;
+		if(this.configuration.capacityFactor > 0)
+            this.configuration.capacityFactor = this.configuration.capacityFactor - 1;
     }
 
     protected void populatePendingOperations(List<Operation> operations) {

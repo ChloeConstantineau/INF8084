@@ -62,6 +62,8 @@ public class UnsecureDispatcher extends Dispatcher {
             executor.shutdown();
             while (!executor.isTerminated()) {
             }
+            
+            System.out.println("Finishes thread?");
 
             //Remove dead servers if any
             if(lostServers.size() > 0){
@@ -70,9 +72,11 @@ public class UnsecureDispatcher extends Dispatcher {
                 }
                 lostServers.clear();
             }
+            
+            System.out.println(roundResult);
 
             //Is result valid
-            if(roundResult.size() > 2) {
+            if(roundResult.size() >= 2) {
                 //Find duplicate
                 ConcurrentLinkedQueue<Integer> copyResult = roundResult;
                 boolean foundDuplicate = false;
@@ -84,6 +88,8 @@ public class UnsecureDispatcher extends Dispatcher {
                         this.taskResults.add(TaskResult.of(result, null)); //At lest two servers found this result, must be good
                     }
                 }
+                
+                System.out.println(foundDuplicate);
 
                 //Will redo operations if results not valid
                 if (!foundDuplicate)
