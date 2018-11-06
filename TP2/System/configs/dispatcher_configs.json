@@ -3,7 +3,7 @@
     "username": "abc",
     "password": "123"
   },
-  "secureMode" : false,
+  "secureMode" : true,
   "fileName" : "operations-1481.txt",
   "availableServers" :
   [
@@ -14,11 +14,7 @@
     {
       "host" : "127.0.0.1",
       "port" : "5012"
-    },
-    {
-      "host" : "127.0.0.1",
-      "port" : "5013"
     }
   ],
-  "capacityFactor" : 8
+  "capacityFactor" : 5
 }

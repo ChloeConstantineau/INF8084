@@ -44,7 +44,10 @@ public class SecureDispatcher extends Dispatcher {
                     while (this.pendingOperations.peek() != null) {
                         System.out.println(this.pendingOperations.size());
 
-                        int C = capacityAndFactor - this.overloadCount.get(calculationServerId);
+						int C = capacityAndFactor;
+						if(this.overloadCount.contains(calculationServerId))
+							C = C - this.overloadCount.get(calculationServerId);;
+						
                         System.out.println(C + " CAPACITY");
 
                         List<Operation> toDo = new ArrayList<>();
