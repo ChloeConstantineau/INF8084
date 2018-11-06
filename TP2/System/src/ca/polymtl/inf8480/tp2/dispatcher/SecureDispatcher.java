@@ -42,16 +42,11 @@ public class SecureDispatcher extends Dispatcher {
 
                 executor.execute(() -> {
                     while (this.pendingOperations.peek() != null) {
-                        System.out.println(this.pendingOperations.size() + " ---id " + calculationServerId );
 
 						int C = capacityAndFactor;
 						if(this.overloadCount.containsKey(calculationServerId)){
-							System.out.println("Before : " + C);
 							C = C - this.overloadCount.get(calculationServerId);
-							System.out.println("After : " + C);
 						}
-						
-                        System.out.println(C + " CAPACITY");
 
                         List<Operation> toDo = new ArrayList<>();
                         for (int i = 0; i < C && this.pendingOperations.peek() != null; i++) {
@@ -59,17 +54,13 @@ public class SecureDispatcher extends Dispatcher {
                             toDo.add(op);
                         }
                         
-						System.out.println(toDo.size() + " toDo size ");
                         if (!toDo.isEmpty()) {
                             try {
-								System.out.println("Is being sent to operation server..");
                                 TaskResult tResult = stub.execute(this.configuration.credentials, new Task(toDo));
                                 this.taskResults.add(tResult);
                                 if (tResult.hadFailure instanceof OverloadingServerException) {
-                                    System.out.println("OVERLOADED ERROR");
                                     this.incrementOverloadCount(calculationServerId);
                                     this.pendingOperations.addAll(toDo);                                    
-                                    System.out.println(this.pendingOperations.size() + " just put back " + toDo.size());
                                 }
                             } catch (RemoteException e) {
                                 System.out.println(e.getMessage());
@@ -97,7 +88,5 @@ public class SecureDispatcher extends Dispatcher {
 			int newValue = oldValue + 1;
 			this.overloadCount.put(serverId, newValue);
 		}
-            
-        System.out.println(this.overloadCount.get(serverId) + " Overload count for " + serverId);
     }
 }
