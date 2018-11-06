@@ -60,8 +60,6 @@ public class OperationServer implements IOperationServer {
         this.configuration =
                 Parser.<OperationServerConfiguration>parseJson(String.format(Constants.DEFAULT_OPERATION_SERVER_CONFIGS +
                         "server_%d.json", id), OperationServerConfiguration.class);
-
-        System.out.println("Breaking here?");
         LDAPconfiguration = Parser.loadLDAPDetails();
     }
 
