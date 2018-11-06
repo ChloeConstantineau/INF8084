@@ -175,10 +175,12 @@ public abstract class Dispatcher {
     }
 
     protected void setFinalResult() {
-
+		finalResult = 0;
         for (TaskResult result : this.taskResults) {
             finalResult += result.result;
         }
+        
+        finalResult = finalResult % 4000;
 
         System.out.println(finalResult);
     }
