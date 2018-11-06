@@ -163,24 +163,11 @@ public abstract class Dispatcher {
         }
     }
 
-    protected void makeTaskEasier() {
-		if(this.configuration.capacityFactor > 0)
-            this.configuration.capacityFactor = this.configuration.capacityFactor - 1;
-    }
-
-    protected void populatePendingOperations(List<Operation> operations) {
-        for (Operation op : operations) {
-            this.pendingOperations.add(op);
-        }
-    }
-
     protected void setFinalResult() {
 		finalResult = 0;
         for (TaskResult result : this.taskResults) {
             finalResult += result.result;
         }
-        
-        finalResult = finalResult % 4000;
 
         System.out.println(finalResult);
     }
