@@ -98,10 +98,11 @@ public class LDAP implements ILDAP {
     public void registerOperationServer(String hostname) throws RemoteException {
         System.out.println("Registering Operation Server");
         try {
-            if (operationServerRegistry.contains(hostname) && !ping(hostname)) {
-                throw new ServerRegistrationException();
-            }
-            operationServerRegistry.add(hostname);
+			if(!operationServerRegistry.contains(hostname)){
+				operationServerRegistry.add(hostname);
+			}else if(!ping(hostname)){
+				operationServerRegistry.remove(hostname);
+			}
         } catch (NullPointerException e) {
             System.out.println(e.getMessage());
             throw new ServerRegistrationException();

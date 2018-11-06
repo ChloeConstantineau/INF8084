@@ -26,7 +26,7 @@ public class SecureDispatcher extends Dispatcher {
             if (stub != null) {
                 executor.execute(() -> {   
                     while (this.pendingOperations.peek() != null) {						
-						
+						System.out.println(this.pendingOperations.size());
 						int capacity = 0;
                     try {
                         capacity = stub.getCapacity();
@@ -43,22 +43,21 @@ public class SecureDispatcher extends Dispatcher {
                         }
 
                         if (!toDo.isEmpty()) {
-
-                            Task task = new Task(toDo);
-
                             try {
-                                TaskResult tResult = stub.execute(this.configuration.credentials, task);
-
-                                if (tResult.hadFailure == null) {
-                                    this.taskResults.add(tResult);
-                                } else if (tResult.hadFailure instanceof OverloadingServerException) {
+                                TaskResult tResult = stub.execute(this.configuration.credentials, new Task(toDo));
+                                this.taskResults.add(tResult);
+                                if (tResult.hadFailure instanceof OverloadingServerException) {
 									System.out.println("OVERLOADED ERROR");
                                     this.makeTaskEasier();
-                                    this.populatePendingOperations(toDo);
+                                    for (Operation op : toDo) {
+										this.pendingOperations.add(op);
+									}
                                 }
                             } catch (RemoteException e) {
                                 System.out.println(e.getMessage());
-                                this.populatePendingOperations(toDo);
+                                for (Operation op : toDo) {
+										this.pendingOperations.add(op);
+								}
                                 break;
                             }
                         }

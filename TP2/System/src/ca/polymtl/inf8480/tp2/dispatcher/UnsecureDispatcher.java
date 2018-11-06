@@ -11,7 +11,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class UnsecureDispatcher extends Dispatcher {
-
+	
     @Override
     public void dispatch() {
         if (this.operationServers.size() <= 1) {
@@ -21,7 +21,7 @@ public class UnsecureDispatcher extends Dispatcher {
 
         List<String> lostServers = new ArrayList<>();
 
-        while (this.operationServers.size() > 1 && this.pendingOperations.peek() != null) {
+        while (this.operationServerIds.size() > 2 && this.pendingOperations.peek() != null ) {
 
             List<Operation> toDo = new ArrayList<>();
             for (int i = 0; i < averageCapacity + this.configuration.capacityFactor && this.pendingOperations.peek() != null; i++) {
@@ -76,7 +76,7 @@ public class UnsecureDispatcher extends Dispatcher {
             System.out.println(roundResult);
 
             //Is result valid
-            if(roundResult.size() >= 2) {
+            if(roundResult.size() > 2) {
                 //Find duplicate
                 ConcurrentLinkedQueue<Integer> copyResult = roundResult;
                 boolean foundDuplicate = false;
@@ -85,7 +85,7 @@ public class UnsecureDispatcher extends Dispatcher {
                     roundResult.remove(result);
                     if (roundResult.contains(result)) {
                         foundDuplicate = true;
-                        this.taskResults.add(TaskResult.of(result, null)); //At lest two servers found this result, must be good
+                        this.taskResults.add(TaskResult.of(result, null)); //At least two servers found this result, must be good
                     }
                 }
                 
