@@ -47,7 +47,7 @@ public class OperationServer implements IOperationServer {
     private void loadLDAPStub(String hostname) {
         System.out.println("Loading LDAP stub");
         try {
-            Registry registry = LocateRegistry.getRegistry(hostname, Constants.LDAP_PORT);
+            Registry registry = LocateRegistry.getRegistry(Constants.RMI_REGISTRY_PORT);
             LDAPStub = (ILDAP) registry.lookup("LDAP");
         } catch (NotBoundException e) {
             System.out.println(ConsoleOutput.REGISTRY_NOT_FOUND.toString() + " : " + "LDAP");
