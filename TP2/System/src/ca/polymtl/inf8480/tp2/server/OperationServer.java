@@ -52,7 +52,7 @@ public class OperationServer implements IOperationServer {
         } catch (NotBoundException e) {
             System.out.println(ConsoleOutput.REGISTRY_NOT_FOUND.toString() + " : " + "LDAP");
         } catch (RemoteException e) {
-            System.out.println("Error: " + e.getMessage());
+            System.out.println("Error: could not load LDAP stub");
         }
     }
 

@@ -81,7 +81,7 @@ public abstract class Dispatcher {
         } catch (NotBoundException e) {
             System.out.println(ConsoleOutput.REGISTRY_NOT_FOUND.toString() + " : LDAP");
         } catch (RemoteException e) {
-            System.out.println("Error: " + e.getMessage());
+            System.out.println("Error: LDAP stub was not found");
         }
     }
 
