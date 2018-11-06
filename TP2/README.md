@@ -1,64 +1,39 @@
 # INF8480
 Distributed systems - Cloud
 
-# TP1 -
-## Partie 1 -
+# TP2 -
+
+Nous avons créé des fichiers JSON pour la configuration des différentes parties du système. Tous les JSON sont présents dans le dossier configs.
+
+*Les Serveurs*
+dans operationServer/Server_X.json :
+Vous pouvez y mettre le C, le m, le port et le host de votre serveur
+
+*Le dispatcher* 
+dans dispatcher_configs.json
+Vous devez spécifier les credentials de votre dispatcher, son moed de sécurité, le nom du fichier d'opération à effectuer (ce fichier doit être mis dans le dossier ./operationFiles), 
+les serveurs que vous voulez et leur nombre. Il faut s'assurer que les caractéristiques de chacun corresponde aux mêmes valeurs spécifié dans les fichiers server_X.json. Ainsi, le premier serveur spécifié dans la liste correspond au serveur serveur_1.json.
+Cela veut dire que vous evez avoir au moins le même nombre de fichier server_x.json que de serveur présents dans la liste des serveurs difinit dans dispatcher_configs.json.
+Vous pouvez aussi spécifier le facteur de capacité. Il s'agit du nombre d'opération envoyé au serveur en plus de sa capacité (ie n = C + fC);
+
+*LDAP*
+dans LDAP_configs.json
+Vous pouvez spécifier le host et le port de ce processus.
+
+*Dans tous les cas, le port du RMIRegistry doit être 5005, il n'est pas configurable nul part*
+
+Faites vos configuration comme vous le désirez puis exécuter les étapes ci-dessous
 
 Étapes:
 
-0. Aller dans dossier TP1\Partie_1\ResponseTime_Analyzer
-1. Compiler le projet avec la commande : ant
-2. cd dans le dossier : bin
-3. Lancer la commande : rmiregistry &
-4. Excuter le serveur : cd.. puis ./server.sh
-	IL faut exécuter les étapes 0 à 4 pour le serveur distant et le serveur local.
-5. Lancer le client sur la machine locale : ./client ipDistantServer x	
-	x est la taille des arguments passés en paramètre lors de l'appel de fonction emptyFunc(). La taille est de l'ordre de 10^x.
-    le client saura se connecté au serveur local (127.0.0.1), il ne requiert donc que l'adresse ip du serveur distant.
-	
+1. ant
+2. cd bin/
+3. rmiregistry 5005 & 
+4. cd ..
+5. ./LDAP.sh
+6. Lancé autant de serveur que vous le désirez. Pour lancer un serveur il faut faire la commande :
+	./OperationServer X
+	X correspond au serveur voulu exemple serveur_1.json
+7. ./client.sh
 
-## Partie 2 - 
-
-Étapes:
-
-### Lancer le server d'authentification
-0. Aller dans dossier TP1\Partie_2
-1. Compiler le projet avec la commande : ant
-2. cd dans le dossier : bin
-3. Lancer la commande : rmiregistry &
-4. Sortir du bin : cd ..
-5. Excuter le serveur : ./serverAuth.sh 
-
-### Lancer le server de gestion de fichiers
-0. Aller dans dossier TP1/Partie_2
-1. Executer le server : ./serverFileSystem.sh
-
-### Partie Client
-0. Lancer un client avec un authentifiant :
-	-> ./client.sh new username password
-	-> ./client.sh verify username password
-1. Si l'étape 5 réussit, alors vous serez authentifier en temps que username (celui que vous avez donné) pour toutes les opérations subséquentes. Si une nouvelle authentification (new ou verify) a lieu, ce username sera maintenant l'utilisateur courant (current user). Ce faisant, pour tester deux clients, vous devrez suivre la démarche présentée en #2. 
-2. Pour tester deux clients en même temps :
-        -> Ouvrir un terminal à partir de TP1/Partie_2 et lancer client_1 avec un authentifiant (voir #0)
-        -> Dans un autre terminal, aller dans TP1/Partie_2/Client_2
-        -> Compiler le client_2 avec la commande : ant
-        -> Lancer client_2 avec un authentifiant (voir #0)
-        -> Utiliser les commandes présentes en #3
-
-3. Voici les autres appels de fonction possible:
-	-> ./client.sh create fileName
-	-> ./client.sh list
-	-> ./client.sh syncLocalDirectory
-       -> ./client.sh syncLocalFiles
-	-> ./client.sh get
-	-> ./client.sh lock fileName
-	-> ./client.sh push fileName
-        
-        * note : la commande syncLocalDirectory synchronise l'ensemble des fichiers présents sur le server avec le répertoire local du client, donc tous les fichiers du server sont rapatriés et se retrouvent dans le répertoire du client. La commande syncLocalFiles met à jour tous les fichiers du client avec leur version trouvée sur le server. On met donc à jour les fichiers du client sans rapatrier les fichiers qu'il ne possède pas déjà.
-
-
-Les fichiers existants côté client sont dans le répertoire ./ClientSide/Files/. La liste des utilisateurs ayant réussi à se connecter au serveur exite aussi dans le répertoire ./ClientSide/ClientList.txt. Le fichier CurrentUser.txt contient le nom de l'utilisateur courant.
-Les fichiers existants côté serveur sont dans le répertoire ./ServerSide/Files/. La liste des utilisateurs ayant réussi à se connecter au server se trouve dans le fichier ./ServerSide/ClientList.txt.  
-
-### Troubleshoot
-Si le terminal indique que vous n'avez pas les persmissions pour ce projet, exécuter la commande : chmod 777 ./myProject.sh
+Il est possible d'arrêter et de repartir un sserveur en cours de route. Vous devriez voir dans les terminaux approprié qu'une erreur a été lancé, mais que le processus termine tout de même ses tâches.
