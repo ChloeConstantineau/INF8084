@@ -162,6 +162,7 @@ public class OperationServer implements IOperationServer {
                     result += Utils.prime(op.value);
                     break;
             }
+            
             result = result % 4000;
         }
         return result;

@@ -42,36 +42,29 @@ public class SecureDispatcher extends Dispatcher {
 
                 executor.execute(() -> {
                     while (this.pendingOperations.peek() != null) {
-                        System.out.println(this.pendingOperations.size());
 
 						int C = capacityAndFactor;
-						if(this.overloadCount.contains(calculationServerId))
-							C = C - this.overloadCount.get(calculationServerId);;
-						
-                        System.out.println(C + " CAPACITY");
+						if(this.overloadCount.containsKey(calculationServerId)){
+							C = C - this.overloadCount.get(calculationServerId);
+						}
 
                         List<Operation> toDo = new ArrayList<>();
                         for (int i = 0; i < C && this.pendingOperations.peek() != null; i++) {
                             Operation op = this.pendingOperations.poll();
                             toDo.add(op);
                         }
-
+                        
                         if (!toDo.isEmpty()) {
                             try {
                                 TaskResult tResult = stub.execute(this.configuration.credentials, new Task(toDo));
                                 this.taskResults.add(tResult);
                                 if (tResult.hadFailure instanceof OverloadingServerException) {
-                                    System.out.println("OVERLOADED ERROR");
                                     this.incrementOverloadCount(calculationServerId);
-                                    for (Operation op : toDo) {
-                                        this.pendingOperations.add(op);
-                                    }
+                                    this.pendingOperations.addAll(toDo);                                    
                                 }
                             } catch (RemoteException e) {
                                 System.out.println(e.getMessage());
-                                for (Operation op : toDo) {
-                                    this.pendingOperations.add(op);
-                                }
+                                this.pendingOperations.addAll(toDo);
                                 break;
                             }
                         }
@@ -90,7 +83,10 @@ public class SecureDispatcher extends Dispatcher {
     private void incrementOverloadCount(String serverId) {
         if (!this.overloadCount.containsKey(serverId))
             this.overloadCount.put(serverId, 1);
-        else
-            this.overloadCount.computeIfPresent(serverId, (tokenKey, oldValue) -> oldValue++);
+        else{
+			int oldValue = this.overloadCount.get(serverId);
+			int newValue = oldValue + 1;
+			this.overloadCount.put(serverId, newValue);
+		}
     }
 }
