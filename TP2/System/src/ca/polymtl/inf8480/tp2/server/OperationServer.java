@@ -80,6 +80,10 @@ public class OperationServer implements IOperationServer {
             uniqueName = "server_" + configuration.host + "_" + configuration.port;
             registry.rebind(uniqueName, stub);
             System.out.println("OperationServer" + uniqueName + " ready.");
+            System.out.println("C = " + configuration.C);
+            System.out.println("m = " + configuration.m);
+            System.out.println("Host = " + configuration.host);
+            System.out.println("Port = " + configuration.port);
 
             // register server with LDAP
             LDAPStub.registerOperationServer(uniqueName);

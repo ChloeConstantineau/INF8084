@@ -94,7 +94,6 @@ public abstract class Dispatcher {
 
         for (ServerDetails serverConfig : this.configuration.availableServers) {
             IOperationServer stub = this.loadServerStub(serverConfig);
-            System.out.println("Getting there");
             if (stub != null) {
                 String specificName = "server_" + serverConfig.host + "_" + serverConfig.port;
                 this.operationServers.put(specificName, stub);
@@ -169,7 +168,7 @@ public abstract class Dispatcher {
             finalResult += result.result;
         }
 
-        System.out.println(finalResult);
+        System.out.println("Final result is : " + finalResult);
     }
 
     //To be overridden

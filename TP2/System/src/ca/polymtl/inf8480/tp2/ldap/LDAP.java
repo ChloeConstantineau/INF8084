@@ -47,6 +47,9 @@ public class LDAP implements ILDAP {
             Registry registry = LocateRegistry.getRegistry(Constants.RMI_REGISTRY_PORT);
             registry.rebind("LDAP", stub);
             System.out.println("LDAP server ready.");
+            System.out.println("Host = " + configs.host);
+            System.out.println("Port = " + configs.port);
+
         } catch (ConnectException e) {
             System.err
                     .println("Impossible de se connecter au registre RMI. Est-ce que rmiregistry est lancé ?");

@@ -13,7 +13,7 @@ Vous pouvez y mettre le C, le m, le port et le host de votre serveur
 dans dispatcher_configs.json
 Vous devez spécifier les credentials de votre dispatcher, son moed de sécurité, le nom du fichier d'opération à effectuer (ce fichier doit être mis dans le dossier ./operationFiles), 
 les serveurs que vous voulez et leur nombre. Il faut s'assurer que les caractéristiques de chacun corresponde aux mêmes valeurs spécifié dans les fichiers server_X.json. Ainsi, le premier serveur spécifié dans la liste correspond au serveur serveur_1.json.
-Cela veut dire que vous evez avoir au moins le même nombre de fichier server_x.json que de serveur présents dans la liste des serveurs difinit dans dispatcher_configs.json.
+Cela veut dire que vous devez avoir au moins le même nombre de fichier server_x.json que de serveur présents dans la liste des serveurs difinit dans dispatcher_configs.json. Un maximum de 4 serveurs est fixé.
 Vous pouvez aussi spécifier le facteur de capacité. Il s'agit du nombre d'opération envoyé au serveur en plus de sa capacité (ie n = C + fC);
 
 *LDAP*

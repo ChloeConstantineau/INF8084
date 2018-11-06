@@ -11,6 +11,14 @@ public class Client {
 
         try {
             config = loadDispatcherConfiguration(Constants.DEFAULT_DISPATCHER_CONFIGS);
+            if (config != null) {
+                System.out.println("Configurations are : ");
+                System.out.println("File : " + config.fileName);
+                System.out.println("SecureMode : " + config.secureMode);
+                System.out.println("Number of servers : " + config.availableServers.size());
+                System.out.println("Capacity factor is : " + config.capacityFactor);
+            }
+
         } catch (IOException ioe) {
             System.out.println(ioe.getMessage());
         } finally {

@@ -40,6 +40,7 @@ public class UnsecureDispatcher extends Dispatcher {
 
             ExecutorService executor = Executors.newFixedThreadPool(this.operationServers.size());
 
+            System.out.println("Initiating rounds..");
             for (String calculationServerId : this.operationServerIds) {
                 IOperationServer stub = this.operationServers.get(calculationServerId);
                 if (stub != null) {
@@ -53,6 +54,7 @@ public class UnsecureDispatcher extends Dispatcher {
                                 roundResult.add(tResult.result);
 
                                 if (tResult.hadFailure instanceof OverloadingServerException) {
+                                    System.out.println("Reducing by one the number of operations sent to " + calculationServerId);
                                     this.incrementOverloadCount(calculationServerId);
                                 }
                             } catch (RemoteException e) {
@@ -68,8 +70,6 @@ public class UnsecureDispatcher extends Dispatcher {
             while (!executor.isTerminated()) {
             }
 
-            System.out.println("Finishes thread?");
-
             //Remove dead servers if any
             if (lostServers.size() > 0) {
                 for (String lostSoul : lostServers) {
@@ -77,8 +77,6 @@ public class UnsecureDispatcher extends Dispatcher {
                 }
                 lostServers.clear();
             }
-
-            System.out.println(roundResult);
 
             //Is result valid
             if (roundResult.size() >= 2) {
@@ -94,9 +92,6 @@ public class UnsecureDispatcher extends Dispatcher {
                     }
                 }
 
-                System.out.println(foundDuplicate);
-                System.out.println(nbRetry < Constants.NB_MAX_RETRY);
-
                 //Will redo operations if results not valid
                 if (!foundDuplicate) {
 					nbRetry++;
@@ -109,7 +104,6 @@ public class UnsecureDispatcher extends Dispatcher {
             }
 
             if (nbRetry == Constants.NB_MAX_RETRY) {
-                System.out.println("Setting nbRety to 0");
                 nbRetry = 0;
                 hasAbandonedSome = true;
                 continue;
