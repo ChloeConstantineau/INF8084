@@ -47,7 +47,7 @@ public class OperationServer implements IOperationServer {
     private void loadLDAPStub(String hostname) {
         System.out.println("Loading LDAP stub");
         try {
-            Registry registry = LocateRegistry.getRegistry(hostname);
+            Registry registry = LocateRegistry.getRegistry(hostname, Constants.LDAP_PORT);
             LDAPStub = (ILDAP) registry.lookup("LDAP");
         } catch (NotBoundException e) {
             System.out.println(ConsoleOutput.REGISTRY_NOT_FOUND.toString() + " : " + "LDAP");
@@ -77,7 +77,7 @@ public class OperationServer implements IOperationServer {
         try {
             stub = (IOperationServer) UnicastRemoteObject.exportObject(this, this.configuration.port);
 
-            Registry registry = LocateRegistry.getRegistry(configuration.host, Constants.RMI_REGISTRY_PORT);
+            Registry registry = LocateRegistry.getRegistry(LDAPconfiguration.host, Constants.RMI_REGISTRY_PORT);
 
             uniqueName = String.format("server_%d", this.configuration.port);
             registry.rebind(uniqueName, stub);

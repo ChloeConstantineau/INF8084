@@ -45,8 +45,7 @@ public class LDAP implements ILDAP {
 
         try {
             ILDAP stub = (ILDAP) UnicastRemoteObject.exportObject(this, Constants.LDAP_PORT);
-
-            Registry registry = LocateRegistry.getRegistry(configs.host, Constants.RMI_REGISTRY_PORT);
+            Registry registry = LocateRegistry.createRegistry(Constants.RMI_REGISTRY_PORT);
             registry.rebind("LDAP", stub);
             System.out.println("LDAP server ready.");
         } catch (ConnectException e) {

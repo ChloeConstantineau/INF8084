@@ -50,7 +50,7 @@ public abstract class Dispatcher {
         }
 
         // get LDAP stub and register Dispatcher with LDAP
-        LDAPstub = (ILDAP) loadLDAPInterface(LDAPconfiguration.host, "LDAP");
+        loadLDAPInterface(LDAPconfiguration.host);
         try {
             LDAPstub.registerDispatcher(configuration.credentials);
         } catch (RemoteException e) {
@@ -73,20 +73,16 @@ public abstract class Dispatcher {
         }
     }
 
-    private ILDAP loadLDAPInterface(String hostname, String registryName) {
-        ILDAP stub = null;
-
+    private void loadLDAPInterface(String hostname) {
         System.out.println("Loading LDAP stub");
         try {
-            Registry registry = LocateRegistry.getRegistry(hostname);
-            stub = (ILDAP) registry.lookup(registryName);
+            Registry registry = LocateRegistry.getRegistry(LDAPconfiguration.host, Constants.RMI_REGISTRY_PORT);
+            LDAPstub = (ILDAP) registry.lookup("LDAP");
         } catch (NotBoundException e) {
-            System.out.println(ConsoleOutput.REGISTRY_NOT_FOUND.toString() + " : " + registryName);
+            System.out.println(ConsoleOutput.REGISTRY_NOT_FOUND.toString() + " : LDAP");
         } catch (RemoteException e) {
             System.out.println("Error: " + e.getMessage());
         }
-
-        return stub;
     }
 
     private final void loadOperationStubs() {
@@ -115,7 +111,7 @@ public abstract class Dispatcher {
         IOperationServer stub = null;
 
         try {
-            Registry registry = LocateRegistry.getRegistry(config.host, Constants.RMI_REGISTRY_PORT);
+            Registry registry = LocateRegistry.getRegistry(LDAPconfiguration.host, Constants.RMI_REGISTRY_PORT);
             String specificName = String.format("server_%d_%d", config.host, config.port);
             stub = (IOperationServer) registry.lookup(specificName);
             averageCapacity += stub.getCapacity();
