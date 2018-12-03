@@ -1,47 +1,47 @@
 heat_template_version: 2014-10-16
 
-description: A template to deploy a load balanced web server
+description: A template to deploy a load balanced web server with 2 servers
 
 parameters:
   image:
     type: string
-    description: Image utilisee pour les serveurs
+    description: Image used for servers
     default: INF4410-Ubuntu-trusty-mini
 
   flavor:
     type: string
-    description: Flavor utilisee par les serveurs
+    description: Flavor used for servers
     default: INF4410-mini
 
   subnet_id:
     type: string
-    description: Sous-reseau dans lequel le load balancer sera situe
-    default: 322f1624-9b69-45b1-b9d2-36e2cd166214
+    description: ID of subnet of network used for servers
+    default: 6579eb07-88c3-4707-9c6e-ab90a78cca02
     
   network_id:
     type: string
-    description: Id du network a utilise
+    description: ID of network used
     default: 938775f1-1d27-4d35-a41d-e76eac6797db
     
   external_network_id:
     type: string
-    description: Id du network externel a utilise
-    default: cac571ab-8e5c-4332-8e05-4c69a56bda9e
+    description: Network used by KeyPair
+    default: 0c3b1354-d3d5-4fec-86d3-19d4d1f13785
     
   key_name:
     type: string
-    description: Name of an existing key pair to use for the server
+    description: Name of an existing key pair to use for the servers
     default: cloud-pyserver
     
   server_source_url:
     type: string
-    description: Liens git du serveur a download
+    description: Github link to python server code
     default: https://raw.githubusercontent.com/houssemmh/INF4410-TP3/master/server.py
     
   server_port:
     type: string
-    description: Port du serveur
-    default: 8000
+    description: Server port
+    default: 8080
 
 resources:
   web_nodes:
@@ -102,4 +102,4 @@ resources:
 outputs:
   pool_ip_address:
     value: {get_attr: [pool, vip, address]}
-    description: The IP address of the load balancing pool
+    description: IP address of load balancing pool

@@ -10,22 +10,22 @@ parameters:
     default: cloud-pyserver
   flavor:
     type: string
-    description: Flavor utilisee par les serveurs
+    description: Flavor used for server
     default: INF4410-mini
 
   image:
     type: string
-    description: Image utilisee pour les serveurs
+    description: Image used for server
     default: INF4410-Ubuntu-trusty-mini
     
   network_id:
     type: string
-    description: Id du network a utilise
+    description: ID of network used
     default: 938775f1-1d27-4d35-a41d-e76eac6797db
     
   server_url:
     type: string
-    description: Liens git du serveur a download
+    description: Github link to python server code
     default: https://raw.githubusercontent.com/houssemmh/INF4410-TP3/master/server.py
     
 
